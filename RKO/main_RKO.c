@@ -7,11 +7,20 @@
 
 void ADC_SETUP(char* str, int adc){//e.g. PA0
 
-	if(strcmp(&str[2],"A")==0){							//when GPIO A is used
+	if(str[1]=='A'){	//when GPIO A is used
 		RCC->AHB1ENR|=RCC_AHB1ENR_GPIOAEN;		//GPIO clock enable
 		GPIOA->MODER|=(3u<<(2*atoi(&str[2])));//ADC input pin is analogue mode
 	}
-
+	
+	if(str[1]=='B'){												//when GPIO B is used
+		RCC->AHB1ENR|=RCC_AHB1ENR_GPIOBEN;		//GPIO clock enable
+		GPIOB->MODER|=(3u<<(2*atoi(&str[2])));//ADC input pin is analogue mode
+	}
+	
+	if(str[1]=='C'){												//when GPIO C is used
+		RCC->AHB1ENR|=RCC_AHB1ENR_GPIOCEN;		//GPIO clock enable
+		GPIOC->MODER|=(3u<<(2*atoi(&str[2])));//ADC input pin is analogue mode
+	}
 	if(adc==1){														//if the ADC selected by user is 1
 		RCC->APB2ENR|=RCC_APB2ENR_ADC1EN;		//ADC1 clock enable
 		ADC1->SQR1&=~ADC_SQR1_L;						//set number of conversions per sequence to 1
@@ -33,6 +42,12 @@ void ADC_SETUP(char* str, int adc){//e.g. PA0
 		ADC3->SQR3|=atoi(&str[2]);					//set channel
 		ADC3->CR2|=ADC_CR2_ADON;						//enable ADC
 	}	
+}
+void ADCstartconv(void){
+	ADC1->CR2|=ADC_CR2_SWSTART;
+}
+int ADCout(void){
+	return ADC1->DR;
 }
 void LED_INIT (void)
 {
@@ -81,27 +96,29 @@ void LED3_OFF (void)
 			GPIOB->ODR &= ~(1<<14);							//ONLY TURN LED ON
 }
 int main(void){
-	char* str="PA0";
 	int out;
   int A;
 	initLCD();
-	cmdLCD(LCD_LINE1);
 	ADC_SETUP("PA0",1);
 	LED_INIT();
-  char Sout[20];
-
+	clr_LCD_RS();
+	char Sout[20];
 	while(1){
-
-
-		clr_LCD_RS();
+		ADCstartconv();				//start ADC conversion
+		out=ADCout();
+		sprintf(Sout,"output is= %5.i\n",out);
+		cmdLCD(LCD_LINE1);
 		for(A=0;A<sizeof(Sout);A++){
 			WaitLcdBusy();
-			sprintf(Sout,strcat("output is= %5.i",&str[1]));
 			putLCD(Sout[A]);
 		};
-		ADC1->CR2|=ADC_CR2_SWSTART;				//start ADC conversion
-		while((ADC1->SR&ADC_SR_EOC)==0){};
-		out=ADC1->DR;
+		sprintf(Sout,"                  \n");
+		cmdLCD(LCD_LINE2);
+		for(A=0;A<sizeof(Sout);A++){
+			WaitLcdBusy();
+			putLCD(Sout[A]);
+		};
+
 		if(out<1366){
 			LED1_ON();
 		}
