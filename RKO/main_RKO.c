@@ -2,21 +2,37 @@
 #include <core_cm4.h>
 #include "lcd.h"
 #include "stdio.h"
-void delay (void)
-{	
-	volatile unsigned int i;		//create variable
-	for (i=0; i<1000000; i++);	//WAIT count to 1 million 
-}
-void ADC_SETUP(void){
-	RCC->AHB1ENR|=RCC_AHB1ENR_GPIOAEN;	//GPIOC clock enable
-	GPIOA->MODER|=(3u<<(2*0));	//ADC input pin is analogue mode
-	RCC->APB2ENR|=RCC_APB2ENR_ADC1EN;		//ADC clock enable
-	ADC1->SQR1&=~ADC_SQR1_L;						//set number of conversions per sequence to 1
-	ADC1->SQR3&=~ADC_SQR3_SQ1;					//clear channel select bits
-	ADC1->SQR3|=0;						//set channel
-	ADC1->CR2|=ADC_CR2_ADON;						//enable ADC
-	
+#include <string.h>
+#include <stdlib.h>
 
+void ADC_SETUP(char* str, int adc){//e.g. PA0
+
+	if(strcmp(&str[2],"A")==0){							//when GPIO A is used
+		RCC->AHB1ENR|=RCC_AHB1ENR_GPIOAEN;		//GPIO clock enable
+		GPIOA->MODER|=(3u<<(2*atoi(&str[2])));//ADC input pin is analogue mode
+	}
+
+	if(adc==1){														//if the ADC selected by user is 1
+		RCC->APB2ENR|=RCC_APB2ENR_ADC1EN;		//ADC1 clock enable
+		ADC1->SQR1&=~ADC_SQR1_L;						//set number of conversions per sequence to 1
+		ADC1->SQR3&=~ADC_SQR3_SQ1;					//clear channel select bits
+		ADC1->SQR3|=atoi(&str[2]);					//set channel
+		ADC1->CR2|=ADC_CR2_ADON;						//enable ADC
+	}
+	if(adc==2){														//if the ADC selected by user is 2
+		RCC->APB2ENR|=RCC_APB2ENR_ADC2EN;		//ADC1 clock enable
+		ADC2->SQR1&=~ADC_SQR1_L;						//set number of conversions per sequence to 1
+		ADC2->SQR3&=~ADC_SQR3_SQ1;					//clear channel select bits
+		ADC2->SQR3|=atoi(&str[2]);					//set channel
+		ADC2->CR2|=ADC_CR2_ADON;						//enable ADC
+	}	
+	if(adc==3){														//if the ADC selected by user is 3
+		RCC->APB2ENR|=RCC_APB2ENR_ADC3EN;		//ADC1 clock enable
+		ADC3->SQR1&=~ADC_SQR1_L;						//set number of conversions per sequence to 1
+		ADC3->SQR3&=~ADC_SQR3_SQ1;					//clear channel select bits
+		ADC3->SQR3|=atoi(&str[2]);					//set channel
+		ADC3->CR2|=ADC_CR2_ADON;						//enable ADC
+	}	
 }
 void LED_INIT (void)
 {
@@ -65,20 +81,22 @@ void LED3_OFF (void)
 			GPIOB->ODR &= ~(1<<14);							//ONLY TURN LED ON
 }
 int main(void){
-	
+	char* str="PA0";
 	int out;
   int A;
 	initLCD();
 	cmdLCD(LCD_LINE1);
-	ADC_SETUP();
+	ADC_SETUP("PA0",1);
 	LED_INIT();
   char Sout[20];
 
 	while(1){
+
+
 		clr_LCD_RS();
 		for(A=0;A<sizeof(Sout);A++){
 			WaitLcdBusy();
-			sprintf(Sout,"output is= %5.i",out);
+			sprintf(Sout,strcat("output is= %5.i",&str[1]));
 			putLCD(Sout[A]);
 		};
 		ADC1->CR2|=ADC_CR2_SWSTART;				//start ADC conversion
