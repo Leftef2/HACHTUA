@@ -10,6 +10,7 @@
       <TargetName>Target 1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pArmCC>6180000::V6.18::.\ARMCLANG</pArmCC>
       <pCCUsed>6180000::V6.18::.\ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
@@ -398,11 +399,6 @@
               <FileName>my_adc.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\my_adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>my_led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\my_led.c</FilePath>
             </File>
           </Files>
         </Group>
