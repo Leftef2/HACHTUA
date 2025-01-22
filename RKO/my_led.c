@@ -1,18 +1,7 @@
-#include <stm32f429xx.h>
-#include <stdlib.h>
 #include "my_led.h"
+#include "my_functions.h"
 
-int getNum(char* str){
-	if(sizeof(str)==5){
-		return (atoi(&str[2])*10)+atoi(&str[3]);
-	}
-	else if(atoi(&str[2])==0){
-		return 0;
-	}
-	else{
-		return atoi(&str[2]);
-	}
-}
+
 
 void LED_SETUP(char* str){
 	if(str[1]=='A'){//gets the second letter of the input "PB0">B

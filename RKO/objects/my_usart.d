@@ -1,4 +1,5 @@
-./objects/main_rko.o: main_RKO.c \
+./objects/my_usart.o: my_usart.c my_usart.h \
+  C:\Keil_v5\ARM\Pack\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h \
   C:\Keil_v5\ARM\Pack\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f429xx.h \
   C:\Keil_v5\ARM\Pack\ARM\CMSIS\5.9.0\CMSIS\Core\Include\core_cm4.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
@@ -7,9 +8,4 @@
   C:\Keil_v5\ARM\Pack\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_armclang.h \
   C:\Keil_v5\ARM\Pack\ARM\CMSIS\5.9.0\CMSIS\Core\Include\mpu_armv7.h \
   C:\Keil_v5\ARM\Pack\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h \
-  lcd.h \
-  C:\Keil_v5\ARM\Pack\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h my_adc.h my_led.h \
-  my_functions.h my_usart.h
+  my_functions.h
