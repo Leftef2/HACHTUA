@@ -7,7 +7,7 @@
 #include "my_adc.h"
 #include "my_led.h"
 #include "my_functions.h"
-#include "my_usart.h"
+#include "usart.h"
 
 
 int main(void){
@@ -18,9 +18,10 @@ int main(void){
 	LED_SETUP("PB7");
 	LED_SETUP("PB14");
 	clr_LCD_RS();
-	USART_setup("PB8","PB9");
+	init_USART();
 	char Sout[20];
 	while(1){
+		send_usart('A');
 		ADCstartconv(1);				//start ADC conversion
 		sprintf(Sout,"output is= %5.i\n",ADCout(1));
 		char Test[4]="PB12";

@@ -410,9 +410,9 @@
               <FilePath>.\my_functions.c</FilePath>
             </File>
             <File>
-              <FileName>my_usart.c</FileName>
+              <FileName>usart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\my_usart.c</FilePath>
+              <FilePath>.\usart.c</FilePath>
             </File>
           </Files>
         </Group>
