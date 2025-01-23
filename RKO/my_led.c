@@ -2,7 +2,6 @@
 #include "my_functions.h"
 
 
-
 void LED_SETUP(char* str){
 	if(str[1]=='A'){//gets the second letter of the input "PB0">B
 		RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;//enables GPIOB clock

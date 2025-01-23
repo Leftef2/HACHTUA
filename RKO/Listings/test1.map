@@ -16,7 +16,8 @@ Section Cross References
     main_rko.o(.text.main) refers to my_adc.o(.text.ADC_SETUP) for ADC_SETUP
     main_rko.o(.text.main) refers to main_rko.o(.rodata.str1.1) for .L.str.1
     main_rko.o(.text.main) refers to my_led.o(.text.LED_SETUP) for LED_SETUP
-    main_rko.o(.text.main) refers to usart.o(.text.init_USART) for init_USART
+    main_rko.o(.text.main) refers to my_functions.o(.text.getNum) for getNum
+    main_rko.o(.text.main) refers to my_led.o(.text.LED_ON) for LED_ON
     main_rko.o(.text.main) refers to my_led.o(.text.LED_OFF) for LED_OFF
     main_rko.o(.text.main) refers to usart.o(.text.send_usart) for send_usart
     main_rko.o(.text.main) refers to my_adc.o(.text.ADCstartconv) for ADCstartconv
@@ -25,7 +26,6 @@ Section Cross References
     main_rko.o(.text.main) refers to lcd.o(.text.cmdLCD) for cmdLCD
     main_rko.o(.text.main) refers to lcd.o(.text.WaitLcdBusy) for WaitLcdBusy
     main_rko.o(.text.main) refers to lcd.o(.text.putLCD) for putLCD
-    main_rko.o(.text.main) refers to my_led.o(.text.LED_ON) for LED_ON
     main_rko.o(.ARM.exidx.text.main) refers (Special) to _printf_percent.o(.ARM.Collect$$_printf_percent$$00000000) for _printf_percent
     main_rko.o(.ARM.exidx.text.main) refers (Special) to _printf_pad.o(.text) for _printf_pre_padding
     main_rko.o(.ARM.exidx.text.main) refers (Special) to _printf_i.o(.ARM.Collect$$_printf_percent$$00000008) for _printf_i
@@ -65,9 +65,10 @@ Section Cross References
     my_led.o(.ARM.exidx.text.LED_OFF) refers to my_led.o(.text.LED_OFF) for [Anonymous Symbol]
     my_functions.o(.text.getNum) refers to atoi.o(.text) for atoi
     my_functions.o(.ARM.exidx.text.getNum) refers to my_functions.o(.text.getNum) for [Anonymous Symbol]
-    usart.o(.ARM.exidx.text.send_usart) refers to usart.o(.text.send_usart) for [Anonymous Symbol]
+    usart.o(.text.init_USART) refers to my_functions.o(.text.getNum) for getNum
     usart.o(.text.init_USART) refers to system_stm32f4xx.o(.data.SystemCoreClock) for SystemCoreClock
     usart.o(.ARM.exidx.text.init_USART) refers to usart.o(.text.init_USART) for [Anonymous Symbol]
+    usart.o(.ARM.exidx.text.send_usart) refers to usart.o(.text.send_usart) for [Anonymous Symbol]
     startup_stm32f429xx.o(STACK) refers (Special) to heapauxi.o(.text) for __use_two_region_memory
     startup_stm32f429xx.o(HEAP) refers (Special) to heapauxi.o(.text) for __use_two_region_memory
     startup_stm32f429xx.o(RESET) refers (Special) to heapauxi.o(.text) for __use_two_region_memory
@@ -265,14 +266,15 @@ Removing Unused input sections from the image.
     Removing my_functions.o(.text), (0 bytes).
     Removing my_functions.o(.ARM.exidx.text.getNum), (8 bytes).
     Removing usart.o(.text), (0 bytes).
-    Removing usart.o(.ARM.exidx.text.send_usart), (8 bytes).
+    Removing usart.o(.text.init_USART), (1418 bytes).
     Removing usart.o(.ARM.exidx.text.init_USART), (8 bytes).
+    Removing usart.o(.ARM.exidx.text.send_usart), (8 bytes).
     Removing system_stm32f4xx.o(.text), (0 bytes).
     Removing system_stm32f4xx.o(.ARM.exidx.text.SystemInit), (8 bytes).
     Removing system_stm32f4xx.o(.ARM.exidx.text.SystemCoreClockUpdate), (8 bytes).
     Removing system_stm32f4xx.o(.rodata.APBPrescTable), (8 bytes).
 
-31 unused section(s) (total 382 bytes) removed from the image.
+32 unused section(s) (total 1800 bytes) removed from the image.
 
 ==============================================================================
 
@@ -461,23 +463,22 @@ Image Symbol Table
     [Anonymous Symbol]                       0x08000d14   Section        0  lcd.o(.text.WaitLcdBusy)
     [Anonymous Symbol]                       0x08000d58   Section        0  lcd.o(.text.cmdLCD)
     [Anonymous Symbol]                       0x08000e1c   Section        0  my_functions.o(.text.getNum)
-    [Anonymous Symbol]                       0x08000e34   Section        0  lcd.o(.text.initLCD)
-    [Anonymous Symbol]                       0x08001120   Section        0  usart.o(.text.init_USART)
-    [Anonymous Symbol]                       0x080011a8   Section        0  main_rko.o(.text.main)
-    [Anonymous Symbol]                       0x0800130c   Section        0  lcd.o(.text.putLCD)
-    [Anonymous Symbol]                       0x080013d0   Section        0  usart.o(.text.send_usart)
-    i._is_digit                              0x080013e2   Section        0  __printf_wp.o(i._is_digit)
-    locale$$code                             0x080013f0   Section       44  lc_ctype_c.o(locale$$code)
-    $v0                                      0x0800141c   Number         0  fpinit.o(x$fpl$fpinit)
-    x$fpl$fpinit                             0x0800141c   Section       26  fpinit.o(x$fpl$fpinit)
-    .L.str.1                                 0x08001446   Data           4  main_rko.o(.rodata.str1.1)
-    [Anonymous Symbol]                       0x08001446   Section        0  main_rko.o(.rodata.str1.1)
-    .L.str.3                                 0x0800144a   Data           5  main_rko.o(.rodata.str1.1)
-    .L.str.2                                 0x0800144f   Data           4  main_rko.o(.rodata.str1.1)
-    locale$$data                             0x08001474   Section      272  lc_ctype_c.o(locale$$data)
-    __lcctype_c_name                         0x08001478   Data           2  lc_ctype_c.o(locale$$data)
-    __lcctype_c_start                        0x08001480   Data           0  lc_ctype_c.o(locale$$data)
-    __lcctype_c_end                          0x08001584   Data           0  lc_ctype_c.o(locale$$data)
+    [Anonymous Symbol]                       0x08000e28   Section        0  lcd.o(.text.initLCD)
+    [Anonymous Symbol]                       0x08001114   Section        0  main_rko.o(.text.main)
+    [Anonymous Symbol]                       0x08001270   Section        0  lcd.o(.text.putLCD)
+    [Anonymous Symbol]                       0x08001334   Section        0  usart.o(.text.send_usart)
+    i._is_digit                              0x08001370   Section        0  __printf_wp.o(i._is_digit)
+    locale$$code                             0x08001380   Section       44  lc_ctype_c.o(locale$$code)
+    $v0                                      0x080013ac   Number         0  fpinit.o(x$fpl$fpinit)
+    x$fpl$fpinit                             0x080013ac   Section       26  fpinit.o(x$fpl$fpinit)
+    .L.str.1                                 0x080013d6   Data           4  main_rko.o(.rodata.str1.1)
+    [Anonymous Symbol]                       0x080013d6   Section        0  main_rko.o(.rodata.str1.1)
+    .L.str.3                                 0x080013da   Data           5  main_rko.o(.rodata.str1.1)
+    .L.str.2                                 0x080013df   Data           4  main_rko.o(.rodata.str1.1)
+    locale$$data                             0x08001404   Section      272  lc_ctype_c.o(locale$$data)
+    __lcctype_c_name                         0x08001408   Data           2  lc_ctype_c.o(locale$$data)
+    __lcctype_c_start                        0x08001410   Data           0  lc_ctype_c.o(locale$$data)
+    __lcctype_c_end                          0x08001514   Data           0  lc_ctype_c.o(locale$$data)
     .bss                                     0x20000008   Section       96  libspace.o(.bss)
     Heap_Mem                                 0x20000068   Data         512  startup_stm32f429xx.o(HEAP)
     HEAP                                     0x20000068   Section      512  startup_stm32f429xx.o(HEAP)
@@ -721,21 +722,20 @@ Image Symbol Table
     SystemInit                               0x08000cbd   Thumb Code    86  system_stm32f4xx.o(.text.SystemInit)
     WaitLcdBusy                              0x08000d15   Thumb Code    68  lcd.o(.text.WaitLcdBusy)
     cmdLCD                                   0x08000d59   Thumb Code   194  lcd.o(.text.cmdLCD)
-    getNum                                   0x08000e1d   Thumb Code    24  my_functions.o(.text.getNum)
-    initLCD                                  0x08000e35   Thumb Code   746  lcd.o(.text.initLCD)
-    init_USART                               0x08001121   Thumb Code   136  usart.o(.text.init_USART)
-    main                                     0x080011a9   Thumb Code   312  main_rko.o(.text.main)
-    putLCD                                   0x0800130d   Thumb Code   194  lcd.o(.text.putLCD)
-    send_usart                               0x080013d1   Thumb Code    18  usart.o(.text.send_usart)
-    _is_digit                                0x080013e3   Thumb Code    14  __printf_wp.o(i._is_digit)
-    _get_lc_ctype                            0x080013f1   Thumb Code    44  lc_ctype_c.o(locale$$code)
-    _fp_init                                 0x0800141d   Thumb Code    26  fpinit.o(x$fpl$fpinit)
-    __fplib_config_fpu_vfp                   0x08001435   Thumb Code     0  fpinit.o(x$fpl$fpinit)
-    __fplib_config_pureend_doubles           0x08001435   Thumb Code     0  fpinit.o(x$fpl$fpinit)
-    AHBPrescTable                            0x08001436   Data          16  system_stm32f4xx.o(.rodata.AHBPrescTable)
-    Region$$Table$$Base                      0x08001454   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08001474   Number         0  anon$$obj.o(Region$$Table)
-    __ctype                                  0x08001481   Data           0  lc_ctype_c.o(locale$$data)
+    getNum                                   0x08000e1d   Thumb Code    10  my_functions.o(.text.getNum)
+    initLCD                                  0x08000e29   Thumb Code   746  lcd.o(.text.initLCD)
+    main                                     0x08001115   Thumb Code   300  main_rko.o(.text.main)
+    putLCD                                   0x08001271   Thumb Code   194  lcd.o(.text.putLCD)
+    send_usart                               0x08001335   Thumb Code    60  usart.o(.text.send_usart)
+    _is_digit                                0x08001371   Thumb Code    14  __printf_wp.o(i._is_digit)
+    _get_lc_ctype                            0x08001381   Thumb Code    44  lc_ctype_c.o(locale$$code)
+    _fp_init                                 0x080013ad   Thumb Code    26  fpinit.o(x$fpl$fpinit)
+    __fplib_config_fpu_vfp                   0x080013c5   Thumb Code     0  fpinit.o(x$fpl$fpinit)
+    __fplib_config_pureend_doubles           0x080013c5   Thumb Code     0  fpinit.o(x$fpl$fpinit)
+    AHBPrescTable                            0x080013c6   Data          16  system_stm32f4xx.o(.rodata.AHBPrescTable)
+    Region$$Table$$Base                      0x080013e4   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08001404   Number         0  anon$$obj.o(Region$$Table)
+    __ctype                                  0x08001411   Data           0  lc_ctype_c.o(locale$$data)
     SystemCoreClock                          0x20000000   Data           4  system_stm32f4xx.o(.data.SystemCoreClock)
     __libspace_start                         0x20000008   Data          96  libspace.o(.bss)
     __temporary_stack_top$libspace           0x20000068   Data           0  libspace.o(.bss)
@@ -748,9 +748,9 @@ Memory Map of the image
 
   Image Entry point : 0x08000269
 
-  Load Region LR_1 (Base: 0x08000000, Size: 0x00001588, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x08000000, Size: 0x00001518, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00001584, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00001514, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -854,32 +854,33 @@ Memory Map of the image
     0x08000d14   0x08000d14   0x00000044   Code   RO           15    .text.WaitLcdBusy   lcd.o
     0x08000d58   0x08000d58   0x000000c2   Code   RO           21    .text.cmdLCD        lcd.o
     0x08000e1a   0x08000e1a   0x00000002   PAD
-    0x08000e1c   0x08000e1c   0x00000018   Code   RO           63    .text.getNum        my_functions.o
-    0x08000e34   0x08000e34   0x000002ea   Code   RO           25    .text.initLCD       lcd.o
-    0x0800111e   0x0800111e   0x00000002   PAD
-    0x08001120   0x08001120   0x00000088   Code   RO           74    .text.init_USART    usart.o
-    0x080011a8   0x080011a8   0x00000164   Code   RO            2    .text.main          main_rko.o
-    0x0800130c   0x0800130c   0x000000c2   Code   RO           23    .text.putLCD        lcd.o
-    0x080013ce   0x080013ce   0x00000002   PAD
-    0x080013d0   0x080013d0   0x00000012   Code   RO           72    .text.send_usart    usart.o
-    0x080013e2   0x080013e2   0x0000000e   Code   RO          129    i._is_digit         c_w.l(__printf_wp.o)
-    0x080013f0   0x080013f0   0x0000002c   Code   RO          196    locale$$code        c_w.l(lc_ctype_c.o)
-    0x0800141c   0x0800141c   0x0000001a   Code   RO          266    x$fpl$fpinit        fz_wm.l(fpinit.o)
-    0x08001436   0x08001436   0x00000010   Data   RO           98    .rodata.AHBPrescTable  system_stm32f4xx.o
-    0x08001446   0x08001446   0x0000000d   Data   RO            4    .rodata.str1.1      main_rko.o
-    0x08001453   0x08001453   0x00000001   PAD
-    0x08001454   0x08001454   0x00000020   Data   RO          341    Region$$Table       anon$$obj.o
-    0x08001474   0x08001474   0x00000110   Data   RO          195    locale$$data        c_w.l(lc_ctype_c.o)
+    0x08000e1c   0x08000e1c   0x0000000a   Code   RO           63    .text.getNum        my_functions.o
+    0x08000e26   0x08000e26   0x00000002   PAD
+    0x08000e28   0x08000e28   0x000002ea   Code   RO           25    .text.initLCD       lcd.o
+    0x08001112   0x08001112   0x00000002   PAD
+    0x08001114   0x08001114   0x0000015c   Code   RO            2    .text.main          main_rko.o
+    0x08001270   0x08001270   0x000000c2   Code   RO           23    .text.putLCD        lcd.o
+    0x08001332   0x08001332   0x00000002   PAD
+    0x08001334   0x08001334   0x0000003c   Code   RO           74    .text.send_usart    usart.o
+    0x08001370   0x08001370   0x0000000e   Code   RO          129    i._is_digit         c_w.l(__printf_wp.o)
+    0x0800137e   0x0800137e   0x00000002   PAD
+    0x08001380   0x08001380   0x0000002c   Code   RO          196    locale$$code        c_w.l(lc_ctype_c.o)
+    0x080013ac   0x080013ac   0x0000001a   Code   RO          266    x$fpl$fpinit        fz_wm.l(fpinit.o)
+    0x080013c6   0x080013c6   0x00000010   Data   RO           98    .rodata.AHBPrescTable  system_stm32f4xx.o
+    0x080013d6   0x080013d6   0x0000000d   Data   RO            4    .rodata.str1.1      main_rko.o
+    0x080013e3   0x080013e3   0x00000001   PAD
+    0x080013e4   0x080013e4   0x00000020   Data   RO          341    Region$$Table       anon$$obj.o
+    0x08001404   0x08001404   0x00000110   Data   RO          195    locale$$data        c_w.l(lc_ctype_c.o)
 
 
-    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x08001584, Size: 0x00000004, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x08001514, Size: 0x00000004, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   0x08001584   0x00000004   Data   RW           97    .data.SystemCoreClock  system_stm32f4xx.o
+    0x20000000   0x08001514   0x00000004   Data   RW           97    .data.SystemCoreClock  system_stm32f4xx.o
 
 
-    Execution Region ER_ZI (Exec base: 0x20000008, Load base: 0x08001588, Size: 0x00000660, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_ZI (Exec base: 0x20000008, Load base: 0x08001518, Size: 0x00000660, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -896,18 +897,18 @@ Image component sizes
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
       1202          0          0          0          0       6446   lcd.o
-       356         44         13          0          0       1324   main_rko.o
+       348         48         13          0          0       1260   main_rko.o
        444          0          0          0          0       2794   my_adc.o
-        24          0          0          0          0        485   my_functions.o
+        10          0          0          0          0        483   my_functions.o
        644          0          0          0          0       2476   my_led.o
         64         26        428          0       1536        900   startup_stm32f429xx.o
        212          0         16          4          0       2801   system_stm32f4xx.o
-       154          0          0          0          0       2068   usart.o
+        60          0          0          0          0       3476   usart.o
 
     ----------------------------------------------------------------------
-      3118         70        490          4       1536      19294   Object Totals
+      3004         74        490          4       1536      20636   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-        18          0          1          0          0          0   (incl. Padding)
+        20          0          1          0          0          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -955,8 +956,8 @@ Image component sizes
         26          0          0          0          0        116   fpinit.o
 
     ----------------------------------------------------------------------
-      1628         66        272          0         96       2096   Library Totals
-        16          0          0          0          0          0   (incl. Padding)
+      1630         66        272          0         96       2096   Library Totals
+        18          0          0          0          0          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -966,7 +967,7 @@ Image component sizes
         26          0          0          0          0        116   fz_wm.l
 
     ----------------------------------------------------------------------
-      1628         66        272          0         96       2096   Library Totals
+      1630         66        272          0         96       2096   Library Totals
 
     ----------------------------------------------------------------------
 
@@ -975,15 +976,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      4746        136        762          4       1632      20230   Grand Totals
-      4746        136        762          4       1632      20230   ELF Image Totals
-      4746        136        762          4          0          0   ROM Totals
+      4634        140        762          4       1632      21572   Grand Totals
+      4634        140        762          4       1632      21572   ELF Image Totals
+      4634        140        762          4          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 5508 (   5.38kB)
+    Total RO  Size (Code + RO Data)                 5396 (   5.27kB)
     Total RW  Size (RW Data + ZI Data)              1636 (   1.60kB)
-    Total ROM Size (Code + RO Data + RW Data)       5512 (   5.38kB)
+    Total ROM Size (Code + RO Data + RW Data)       5400 (   5.27kB)
 
 ==============================================================================
 

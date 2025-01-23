@@ -18,13 +18,18 @@ int main(void){
 	LED_SETUP("PB7");
 	LED_SETUP("PB14");
 	clr_LCD_RS();
-	init_USART();
+	if(getNum("PB8")==8){
+		LED_ON("PB0");
+	}
+
+	
+
 	char Sout[20];
 	while(1){
-		send_usart('A');
+		send_usart(3,'A');
 		ADCstartconv(1);				//start ADC conversion
 		sprintf(Sout,"output is= %5.i\n",ADCout(1));
-		char Test[4]="PB12";
+
 		cmdLCD(LCD_LINE1);
 		for(A=0;A<sizeof(Sout);A++){
 			WaitLcdBusy();
@@ -38,10 +43,10 @@ int main(void){
 		};
 
 		if(ADCout(1)<1366){
-			LED_ON("PB0");
+//			LED_ON("PB0");
 		}
 		else{
-			LED_OFF("PB0");
+//			LED_OFF("PB0");
 		}
 		if(1366<ADCout(1)&ADCout(1)<2732){
 			LED_ON("PB7");
