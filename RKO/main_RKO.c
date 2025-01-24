@@ -18,9 +18,8 @@ int main(void){
 	LED_SETUP("PB7");
 	LED_SETUP("PB14");
 	clr_LCD_RS();
-	if(getNum("PB8")==8){
-		LED_ON("PB0");
-	}
+	init_USART(3,"PD8","PD9");
+
 
 	
 
@@ -43,10 +42,10 @@ int main(void){
 		};
 
 		if(ADCout(1)<1366){
-//			LED_ON("PB0");
+			LED_ON("PB0");
 		}
 		else{
-//			LED_OFF("PB0");
+			LED_OFF("PB0");
 		}
 		if(1366<ADCout(1)&ADCout(1)<2732){
 			LED_ON("PB7");
