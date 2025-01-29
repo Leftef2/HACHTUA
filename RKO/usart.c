@@ -90,12 +90,21 @@ void init_USART(int mod,char* Pin1,char* Pin2){
 		}
 
 	RCC->APB1ENR|=RCC_APB1ENR_USART3EN;			//usart clock enable
+		if(mod==1){			//USART CONFIG
+			USART1->CR1|=	USART_CR1_TE;//transmit enable
+			USART1->CR1|=	USART_CR1_RE;//receive enable
+			USART1->CR1|=	USART_CR1_UE;//usart main enable bit
+			
+			USART1->BRR=SystemCoreClock/(9600);		//set baud rate
+																									//this is not an accurate way to set the baudrate
+																									//and only works for 16Mhz system clock.
+		}
 		if(mod==2){			//USART CONFIG
 			USART2->CR1|=	USART_CR1_TE;//transmit enable
 			USART2->CR1|=	USART_CR1_RE;//receive enable
 			USART2->CR1|=	USART_CR1_UE;//usart main enable bit
 			
-			USART2->BRR=SystemCoreClock/(9600);		//set baud rate
+			USART2->BRR=SystemCoreClock/(9600);		//set baud rate (idk how this works so i stole it)
 																									//this is not an accurate way to set the baudrate
 																									//and only works for 16Mhz system clock.
 		}
@@ -108,17 +117,60 @@ void init_USART(int mod,char* Pin1,char* Pin2){
 																									//this is not an accurate way to set the baudrate
 																									//and only works for 16Mhz system clock.
 		}
+		if(mod==4){			//USART CONFIG
+			UART4->CR1|=	USART_CR1_TE;//transmit enable
+			UART4->CR1|=	USART_CR1_RE;//receive enable
+			UART4->CR1|=	USART_CR1_UE;//usart main enable bit
+			
+			UART4->BRR=SystemCoreClock/(9600);		//set baud rate (idk how this works so i stole it)
+																									//this is not an accurate way to set the baudrate
+																									//and only works for 16Mhz system clock.
+		}
+		if(mod==5){			//USART CONFIG
+			UART5->CR1|=	USART_CR1_TE;//transmit enable
+			UART5->CR1|=	USART_CR1_RE;//receive enable
+			UART5->CR1|=	USART_CR1_UE;//usart main enable bit
+			
+			UART5->BRR=SystemCoreClock/(9600);		//set baud rate (idk how this works so i stole it)
+																									//this is not an accurate way to set the baudrate
+																									//and only works for 16Mhz system clock.
+		}
+		if(mod==7){			//USART CONFIG
+			UART7->CR1|=	USART_CR1_TE;//transmit enable
+			UART7->CR1|=	USART_CR1_RE;//receive enable
+			UART7->CR1|=	USART_CR1_UE;//usart main enable bit
+			
+			UART7->BRR=SystemCoreClock/(9600);		//set baud rate (idk how this works so i stole it)
+																									//this is not an accurate way to set the baudrate
+																									//and only works for 16Mhz system clock.
+		}
 	}
 }
 
 void send_usart(int mod,unsigned char d)
 {
-	if(mod==2){
+	if(mod==1){
+	    while(!(USART1->SR & USART_SR_TC));
+	    USART1->DR=d;												//write byte to usart data register
+	}
+	else if(mod==2){
 	    while(!(USART2->SR & USART_SR_TC));
-	    USART2->DR=d;												//write byte to usart data register
+	    USART2->DR=d;			//write byte to usart data register
 	}
 	else if(mod==3){
 	    while(!(USART3->SR & USART_SR_TC));
 	    USART3->DR=d;			//write byte to usart data register
+	}
+	else if(mod==4){
+	    while(!(UART4->SR & USART_SR_TC));
+	    UART4->DR=d;			//write byte to usart data register
+	}
+	else if(mod==5){
+	    while(!(UART5->SR & USART_SR_TC));
+	    UART5->DR=d;			//write byte to usart data register
+	}
+	else if(mod==7){
+	    while(!(UART7->SR & USART_SR_TC));
+	    UART7->DR=d;			//write byte to usart data register
 	}
 }

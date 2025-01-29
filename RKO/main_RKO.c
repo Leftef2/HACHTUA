@@ -9,7 +9,7 @@
 #include "my_functions.h"
 #include "usart.h"
 #include "my_switch.h"
-
+#include "my_buzzer.h"
 
 int main(void){
 	int A;
@@ -20,11 +20,9 @@ int main(void){
 	LED_SETUP("PB14");
 	clr_LCD_RS();
 	init_USART(3,"PD8","PD9");
-//	createSwitch("PG1");
-	createSwitch("PF12");
+	createSwitch("PC13");
 
 	
-
 	char Sout[20];
 	while(1){
 		send_usart(3,'A');
@@ -43,13 +41,20 @@ int main(void){
 			putLCD(Sout[A]);
 		};
 
-		if(Switch("PF12")==1){
-			LED_ON("PB0");
+		
+		int Z;
+		while(Switch("PC13")){
+				Z=!Z;
+				if(Z==1){
+					BUZZER_ON("PB13");
+				}
+				else{
+					BUZZER_OFF("PB13");
+				}
+			}
+		if(!Switch("PC13")){
+			BUZZER_OFF("PB13");
 		}
-		else{
-			LED_OFF("PB0");
-		}
-//		if(Switch("PG2")==1){
 		if(1366<ADCout(1)&ADCout(1)<2732){
 			LED_ON("PB7");
 		}
