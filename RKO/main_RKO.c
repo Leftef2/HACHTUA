@@ -8,6 +8,7 @@
 #include "my_led.h"
 #include "my_functions.h"
 #include "usart.h"
+#include "my_switch.h"
 
 
 int main(void){
@@ -19,7 +20,8 @@ int main(void){
 	LED_SETUP("PB14");
 	clr_LCD_RS();
 	init_USART(3,"PD8","PD9");
-
+//	createSwitch("PG1");
+	createSwitch("PF12");
 
 	
 
@@ -41,12 +43,13 @@ int main(void){
 			putLCD(Sout[A]);
 		};
 
-		if(ADCout(1)<1366){
+		if(Switch("PF12")==1){
 			LED_ON("PB0");
 		}
 		else{
 			LED_OFF("PB0");
 		}
+//		if(Switch("PG2")==1){
 		if(1366<ADCout(1)&ADCout(1)<2732){
 			LED_ON("PB7");
 		}
