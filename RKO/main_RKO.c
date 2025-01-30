@@ -23,29 +23,31 @@ int main(void){
 	LED_SETUP("PB13");
 	clr_LCD_RS();
 	init_USART(3,"PD8","PD9");
-//	createSwitch("PG0");
+
 	timer_init();
 	
 	char Sout[20];
 	while(1){
-		TIM2_IRQHandler();
-//		ADCstartconv(1);
-		K=!K;
-		if(K){
-			LED_ON("PB13");
+		timer9KHzhold();
+		//send_usart(3,'A');
+
+
+		K++;
+		if(K>960){
+			K=0;
+		}
+		if(K<460){
 			LED_ON("PB0");
 		}
 		else{
-			LED_OFF("PB13");
-//			LED_OFF("PB0");
+			LED_OFF("PB0");
 		}
-//		if(Switch("PG0")==1){
-//			if(1366>ADCout(1)){
-				//LED_ON("PB0");
-	//		}
-//			else{
-				//LED_OFF("PB0");
-//			}
+			if(ADCout(1)<1366){
+		//		LED_ON("PB0");
+		}
+			else{
+		//		LED_OFF("PB0");
+			}
 			if(1366<ADCout(1)&ADCout(1)<2732){
 				LED_ON("PB7");
 			}
@@ -58,5 +60,6 @@ int main(void){
 			else{
 				LED_OFF("PB14");
 			}	
+			timer_init();
 		}
 }

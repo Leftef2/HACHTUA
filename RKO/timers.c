@@ -13,7 +13,7 @@ void timer_init(void){
 	SystemCoreClockUpdate();			// Update SystemCoreClock
 
 }
-void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE
+void timer9KHzhold(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE
 {
 	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register
 	GPIOB->ODR^=(1u<<0);								//XOR GPIOB output data register to invert the selected pin
