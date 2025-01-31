@@ -11,10 +11,35 @@
 #include "my_switch.h"
 #include "my_buzzer.h"
 #include "timers.h"
-
+#include "my_dac.h"
+void Shortbuzz(void){
+	int a=0;
+	int buz=0;
+	int time=0;
+	while(a==0){
+		TIM2_IRQHandler();
+		buz++;
+		time++;
+		if(buz>400){
+			buz=0;
+		}
+		if(buz>200){
+			LED_ON("PB13");
+		}
+		else{
+			LED_OFF("PB13");
+		}
+		if(time>200000){
+			break;
+		}
+	}	
+}
+			
 int main(void){
+	int mode=2;
 	int A;
 	int K;
+	int FlashLedCount;
 	initLCD();
 	ADC_SETUP("PA0",1);//sets up PA0 and selects which ADC to use
 	LED_SETUP("PB0");
@@ -23,40 +48,29 @@ int main(void){
 	LED_SETUP("PB13");
 	clr_LCD_RS();
 	init_USART(3,"PD8","PD9");
-//	createSwitch("PG0");
+	createSwitch("PG0");
+	createSwitch("PG3");
 	timer_init();
 	
 	char Sout[20];
 	while(1){
 		TIM2_IRQHandler();
-//		ADCstartconv(1);
-		K=!K;
-		if(K){
-			LED_ON("PB13");
-			LED_ON("PB0");
+		ADCstartconv(1);
+		if(FlashLedCount>(100000*mode)){
+			FlashLedCount=0;
 		}
 		else{
-			LED_OFF("PB13");
-//			LED_OFF("PB0");
+			FlashLedCount++;
 		}
-//		if(Switch("PG0")==1){
-//			if(1366>ADCout(1)){
-				//LED_ON("PB0");
-	//		}
-//			else{
-				//LED_OFF("PB0");
-//			}
-			if(1366<ADCout(1)&ADCout(1)<2732){
-				LED_ON("PB7");
-			}
-			else{
-				LED_OFF("PB7");
-			}
-			if(ADCout(1)>2732){
-				LED_ON("PB14");
-			}
-			else{
-				LED_OFF("PB14");
-			}	
+		if(FlashLedCount<100000&&FlashLedCount!=0){
+			LED_ON("PB14");
 		}
+		else{
+			LED_OFF("PB14");
+		}
+
+		if(Switch("PG3")==1){
+			Shortbuzz();
+		}
+	}
 }

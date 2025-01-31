@@ -12,4 +12,5 @@
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h my_adc.h my_led.h \
-  my_functions.h usart.h my_switch.h my_buzzer.h timers.h
+  my_functions.h usart.h my_switch.h my_buzzer.h timers.h my_dac.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h
