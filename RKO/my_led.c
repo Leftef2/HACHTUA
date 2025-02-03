@@ -54,35 +54,35 @@ void LED_SETUP(char* str){
 }	
 void LED_ON(char* str){
 	if(str[1]=='A'){
-		GPIOA->BSRR|=(1<<getNum(str));//gives 1 to the right pin of BSRR
+		GPIOA->ODR |=(1<<getNum(str));//gives 1 to the right pin and right GPIO
 	}
 	if(str[1]=='B'){
-		GPIOB->BSRR|=(1<<getNum(str));//gives 1 to the right pin of BSRR
+		GPIOB->ODR |=(1<<getNum(str));
 	}
 	if(str[1]=='C'){
-		GPIOC->BSRR|=(1<<getNum(str));//gives 1 to the right pin of BSRR
+		GPIOC->ODR |=(1<<getNum(str));
 	}
 	if(str[1]=='E'){
-		GPIOE->BSRR|=(1<<getNum(str));//gives 1 to the right pin of BSRR
+		GPIOE->ODR |=(1<<getNum(str));
 	}
 	if(str[1]=='F'){
-		GPIOF->BSRR|=(1<<getNum(str));//gives 1 to the right pin of BSRR
+		GPIOF->ODR |=(1<<getNum(str));
 	}
 }
 void LED_OFF(char* str){
 	if(str[1]=='A'){
-		GPIOA->BSRR|=(1<<(16+getNum(str)));//gives 1 reset register of BSRR
+		GPIOA->ODR &=~(1<<getNum(str));//gives 1 to the right pin and right GPIO
 	}
 	if(str[1]=='B'){
-		GPIOB->BSRR|=(1<<(16+getNum(str)));//gives 1 reset register of BSRR
+		GPIOB->ODR &=~(1<<getNum(str));
 	}
 	if(str[1]=='C'){
-		GPIOC->BSRR|=(1<<(16+getNum(str)));//gives 1 reset register of BSRR
+		GPIOC->ODR &=~(1<<getNum(str));
 	}
 	if(str[1]=='E'){
-		GPIOE->BSRR|=(1<<(16+getNum(str)));//gives 1 reset register of BSRR
+		GPIOE->ODR &=~(1<<getNum(str));
 	}
 	if(str[1]=='F'){
-		GPIOF->BSRR|=(1<<(16+getNum(str)));
+		GPIOF->ODR &=~(1<<getNum(str));
 	}
 }

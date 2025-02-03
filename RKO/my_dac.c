@@ -6,13 +6,6 @@
 void Init_DAC2(void)
 {
 	
-//	float f = sin(2*3.14*1.0*0);
-//	2*pi*f*t
-//	
-//	t=Ts*n
-//	Ts = sample TIME (1/Fs)
-//	n = sample_num
-	
 //Enable the clock for GPIO Port A
 RCC->AHB1ENR|=RCC_AHB1ENR_GPIOAEN;
 //Configure the PoRT A pin 5 to be the Analogue
@@ -24,33 +17,55 @@ DAC->CR|=DAC_CR_EN2;
 }
 
 int m;
-void Ramp_Output (void){
-	while(1){
-		for(m=0; m<3000; m++){
-			DAC->DHR12R2=m;
+void Ramp_Output (void){		//Ramp output
+	while(1){									//Enter While loop
+		for(m=0; m<3000; m++){	//Ramp up
+			DAC->DHR12R2=m;				// Print to DAC
 		}
-		for(m=3000; m>0; m--){
-			DAC->DHR12R2=m;
+		for(m=3000; m>0; m--){	//Ramp Down
+			DAC->DHR12R2=m;				// Print to DAC
 		}
 	}}
 
-int q;
-int w;	
-	void Square_Output (void){
+int q;										// Set Int
+int w;										// Set Int
+	void Square_Output (void){	//square output
 		while (1){
-			q=0;
-			DAC->DHR12R2=q;
-			Delay_ms(1);
-			w=3000;
-			DAC->DHR12R2=w;
-			Delay_ms(1);
+			q=0;								// Set Int
+			DAC->DHR12R2=q;			// Print to DAC
+			Delay_ms(1);				//Delay
+			w=3000;							// Set Int
+			DAC->DHR12R2=w;			// Print to DAC
+			Delay_ms(1);				//Delay
 		}
 		}
-	int r;
-			void DC_level(void){
-				r=3000;
+	int r;										// Set Int
+			void DC_level(void){	//DC Level 
+				r=3000;							// Set value
 			}
 				
+			
+			int j;
+void Complex_Output (void){		//Ramp output
+		while(1){									//Enter While loop
+		for(m=0; m<3000; m++){	//Ramp up
+			DAC->DHR12R2=m;				// Print to DAC
+		}
+//		for(m=3000; m>0; m--){	//Ramp Down
+//			DAC->DHR12R2=m;				// Print to DAC
+//		}
+			for(m=0; m<1000; m++){	//Ramp up
+			DAC->DHR12R2=m;				// Print to DAC
+		}
+		for(m=1000; m>0; m--){	//Ramp Down
+			DAC->DHR12R2=m;				// Print to DAC
+		}
+	}
+	
+	
+	
+//			DAC->DHR12R2=m;				// Print to DAC
+//		}
 //			void Sin_Output (void){
 //	
 //			float volts;
@@ -72,4 +87,5 @@ int w;
 //					swatch (0.00001);
 //		}
 //	}
+}
 		
