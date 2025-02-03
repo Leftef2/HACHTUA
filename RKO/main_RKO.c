@@ -17,7 +17,6 @@ void Shortbuzz(void){
 	int buz=0;
 	int time=0;
 	while(a==0){
-		TIM2_IRQHandler();
 		buz++;
 		time++;
 		if(buz>400){
@@ -51,18 +50,19 @@ int main(void){
 	createSwitch("PG0");
 	createSwitch("PG3");
 	timer_init();
-	
 	char Sout[20];
 	while(1){
-		TIM2_IRQHandler();
-		ADCstartconv(1);
-		if(FlashLedCount>(100000*mode)){
+		A=!A;
+		while(TIM2_IRQHandler()==0);
+		//ADCstartconv(1);
+		//send_usart(3,'A');
+		if(FlashLedCount>(100*mode)){
 			FlashLedCount=0;
 		}
 		else{
 			FlashLedCount++;
 		}
-		if(FlashLedCount<100000&&FlashLedCount!=0){
+		if(FlashLedCount<100&&FlashLedCount!=0){
 			LED_ON("PB14");
 		}
 		else{
@@ -71,6 +71,12 @@ int main(void){
 
 		if(Switch("PG3")==1){
 			Shortbuzz();
+		}
+		if(A){
+			LED_ON("PB0");
+		}
+		else{
+			LED_OFF("PB0");
 		}
 	}
 }
