@@ -40,16 +40,15 @@ void cmdLCD(unsigned char cmd)		//sends a byte to the LCD control register
 
 void putLCD(unsigned char put)	//sends a char to the LCD display
 {
-	WaitLcdBusy();				//wait for LCD to be not busy
 	set_LCD_RS();					//text command
 	clr_LCD_RW();					//write command
 	set_LCD_data(put);		//set data on bus
 	LCD_strobe();					//apply command
 }
 
+	
 void initLCD(void)
 {
-		SystemCoreClockUpdate();
 		RCC->AHB1ENR|=RCC_AHB1ENR_GPIODEN;	//enable LCD port clock
 	
 	
@@ -75,7 +74,7 @@ void initLCD(void)
 	clr_LCD_RW();
 	clr_LCD_E();
 	
-	lcd_delayus(25000);		//25ms startup delay
+	//lcd_delayus(25000);		//25ms startup delay
 	cmdLCD(0x38);	//Function set: 2 Line, 8-bit, 5x7 dots
 	cmdLCD(0x0c);	//Display on, Cursor blinking command
 	cmdLCD(0x01);	//Clear LCD

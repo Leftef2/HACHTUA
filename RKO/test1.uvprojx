@@ -429,16 +429,6 @@
               <FileType>1</FileType>
               <FilePath>.\timers.c</FilePath>
             </File>
-            <File>
-              <FileName>my_dac.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\my_dac.c</FilePath>
-            </File>
-            <File>
-              <FileName>wait.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\wait.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
