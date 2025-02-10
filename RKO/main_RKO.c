@@ -33,50 +33,124 @@ void Shortbuzz(void){
 		}
 	}	
 }
-			
-int main(void){
-	int mode=2;
-	int A;
-	int K;
-	int FlashLedCount;
-	initLCD();
-	ADC_SETUP("PA0",1);//sets up PA0 and selects which ADC to use
-	LED_SETUP("PB0");
-	LED_SETUP("PB7");
-	LED_SETUP("PB14");
-	LED_SETUP("PB13");
-	clr_LCD_RS();
-	init_USART(3,"PD8","PD9");
-	createSwitch("PG0");
-	createSwitch("PG3");
-	timer_init();
-	char Sout[20];
-	while(1){
-		A=!A;
-		while(TIM2_IRQHandler()==0);
-		//ADCstartconv(1);
-		//send_usart(3,'A');
-		if(FlashLedCount>(100*mode)){
-			FlashLedCount=0;
+void send_Line1(char* str){
+	cmdLCD(LCD_LINE1);
+	for(int A=0;16;A++){
+		if(A<strlen(str)){
+			putLCD(str[A]);
 		}
 		else{
-			FlashLedCount++;
+			putLCD(' ');
 		}
-		if(FlashLedCount<100&&FlashLedCount!=0){
-			LED_ON("PB14");
-		}
-		else{
-			LED_OFF("PB14");
-		}
-
-		if(Switch("PG3")==1){
-			Shortbuzz();
-		}
-		if(A){
-			LED_ON("PB0");
-		}
-		else{
-			LED_OFF("PB0");
+		if(A==16){
+			break;
 		}
 	}
 }
+void send_Line2(char* str){
+	cmdLCD(LCD_LINE2);
+	for(int A=0;strlen(str);A++){
+		putLCD(str[A]);
+		if(strlen(str)-1==A){
+			break;
+		}
+	}
+}
+
+int main(void){
+	timer_init();
+	initLCD();
+	LED_SETUP("PD14");
+	send_Line1("Loading system...");
+	createSwitch("PG0");
+	createSwitch("PG2");
+	while(1){
+		;
+	}
+}
+int Counter;
+int A=0;
+int MenuPos=0;
+int Wait=0;
+int Selected=0;
+void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop --
+{
+	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register
+	Counter++;
+	if(Wait==0){
+		if(Switch("PG2")){
+			if(Selected==0&&MenuPos==3){
+				MenuPos=0;
+				Selected=0;
+			}
+			else if(Selected<1){
+				Selected=1;
+			}
+			else{
+				MenuPos=MenuPos+1;
+				Selected=0;
+			}
+			Wait=1;
+		}
+		if(Switch("PG0")){
+			if(Selected==0&&MenuPos==0){
+				MenuPos=3;
+				Selected=0;
+			}
+			else if(Selected>0){
+				Selected=0;
+			}
+			else{
+				MenuPos=MenuPos-1;
+				Selected=1;
+			}
+			Wait=1;
+		}
+	}
+	if(!Switch("PG0")&&!Switch("PG2")){
+		Wait=0;
+	}
+	//send_Line1("  bpm/o2 level  ");  MenuPos=0
+	//send_Line1("   CPR assist   ");  MenuPos=1
+	//send_Line1("     options    ");  MenuPos=2
+	//send_Line1("     credits    ");  MenuPos=3
+	if(Counter>240){
+		if(MenuPos==0){
+			if(Selected==0){
+				send_Line1("--bpm/o2 level--");
+				send_Line2("   CPR assist   ");	
+			}		
+			if(Selected==1){
+				send_Line1("  bpm/o2 level  ");
+				send_Line2(" --CPR assist-- ");	
+			}
+		}
+		if(MenuPos==1){
+			if(Selected==0){
+				send_Line1(" --CPR assist-- ");
+				send_Line2("     options    ");	
+			}		
+			if(Selected==1){
+				send_Line1("   CPR assist   ");
+				send_Line2("   --options--  ");	
+			}
+		}
+		if(MenuPos==2){
+			if(Selected==0){
+				send_Line1("   --options--  ");
+				send_Line2("     credits    ");	
+			}		
+			if(Selected==1){
+				send_Line1("     options    ");
+				send_Line2("   --credits--  ");	
+			}
+		}
+		if(MenuPos==3){
+			if(Selected==0){
+				send_Line1("   --credits--  ");
+				send_Line2("                ");	
+			}		
+		}		
+	}
+}
+	
