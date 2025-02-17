@@ -58,12 +58,28 @@ void send_Line2(char* str){
 }
 
 int main(void){
+	
+	
+//	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+//	GPIOA->MODER &= ~(3<<(2*5));
+//	GPIOA->MODER |= (1<<(2*5));
+	
+	
+	while(1){
+					GPIOA->ODR ^=(1<<5);
+
+		for(int i=0;i<100000;i++){
+					__NOP();	
+		}
+		
+	}
 	timer_init();
 	initLCD();
-	LED_SETUP("PD14");
+	LED_SETUP("PA6");
 	send_Line1("Loading system...");
 	createSwitch("PG0");
 	createSwitch("PG2");
+	//LED_ON("PA6");
 	while(1){
 		;
 	}
@@ -73,6 +89,7 @@ int A=0;
 int MenuPos=0;
 int Wait=0;
 int Selected=0;
+int choice=0;
 void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop --
 {
 	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register
@@ -118,39 +135,46 @@ void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop
 		if(MenuPos==0){
 			if(Selected==0){
 				send_Line1("--bpm/o2 level--");
+				choice=1;
 				send_Line2("   CPR assist   ");	
 			}		
 			if(Selected==1){
 				send_Line1("  bpm/o2 level  ");
 				send_Line2(" --CPR assist-- ");	
+				choice=2;
 			}
 		}
 		if(MenuPos==1){
 			if(Selected==0){
 				send_Line1(" --CPR assist-- ");
 				send_Line2("     options    ");	
+				choice=2;
 			}		
 			if(Selected==1){
 				send_Line1("   CPR assist   ");
 				send_Line2("   --options--  ");	
+				choice=3;
 			}
 		}
 		if(MenuPos==2){
 			if(Selected==0){
 				send_Line1("   --options--  ");
+				choice=3;
 				send_Line2("     credits    ");	
 			}		
 			if(Selected==1){
 				send_Line1("     options    ");
 				send_Line2("   --credits--  ");	
+				choice=4;
 			}
 		}
 		if(MenuPos==3){
 			if(Selected==0){
 				send_Line1("   --credits--  ");
+				choice=4;
 				send_Line2("                ");	
 			}		
-		}		
+		}
 	}
 }
 	
