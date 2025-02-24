@@ -58,123 +58,95 @@ void send_Line2(char* str){
 }
 
 int main(void){
-	
-	
-//	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
-//	GPIOA->MODER &= ~(3<<(2*5));
-//	GPIOA->MODER |= (1<<(2*5));
-	
-	
-	while(1){
-					GPIOA->ODR ^=(1<<5);
-
-		for(int i=0;i<100000;i++){
-					__NOP();	
-		}
-		
-	}
 	timer_init();
 	initLCD();
-	LED_SETUP("PA6");
+	LED_SETUP("PB0");
 	send_Line1("Loading system...");
-	createSwitch("PG0");
-	createSwitch("PG2");
-	//LED_ON("PA6");
+	//createSwitch("PG0");
+	//createSwitch("PG2");
+	//createSwitch("PG3");
+	LED_ON("PB0");
 	while(1){
 		;
 	}
 }
-int Counter;
+int Counter=0;
 int A=0;
 int MenuPos=0;
 int Wait=0;
+int Scroll=0;
 int Selected=0;
 int choice=0;
+int ActiveChoice=0;
 void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop --
 {
 	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register
 	Counter++;
-	if(Wait==0){
-		if(Switch("PG2")){
-			if(Selected==0&&MenuPos==3){
-				MenuPos=0;
-				Selected=0;
-			}
-			else if(Selected<1){
-				Selected=1;
-			}
-			else{
-				MenuPos=MenuPos+1;
-				Selected=0;
-			}
-			Wait=1;
-		}
-		if(Switch("PG0")){
-			if(Selected==0&&MenuPos==0){
-				MenuPos=3;
-				Selected=0;
-			}
-			else if(Selected>0){
-				Selected=0;
-			}
-			else{
-				MenuPos=MenuPos-1;
-				Selected=1;
-			}
-			Wait=1;
-		}
-	}
-	if(!Switch("PG0")&&!Switch("PG2")){
-		Wait=0;
-	}
 	//send_Line1("  bpm/o2 level  ");  MenuPos=0
 	//send_Line1("   CPR assist   ");  MenuPos=1
 	//send_Line1("     options    ");  MenuPos=2
 	//send_Line1("     credits    ");  MenuPos=3
-	if(Counter>240){
-		if(MenuPos==0){
-			if(Selected==0){
-				send_Line1("--bpm/o2 level--");
-				choice=1;
-				send_Line2("   CPR assist   ");	
-			}		
-			if(Selected==1){
-				send_Line1("  bpm/o2 level  ");
-				send_Line2(" --CPR assist-- ");	
-				choice=2;
+	//if(ActiveChoice==0){
+		if(Wait==0){
+			if(Switch("PG2")){
+				Scroll=Scroll+1;
 			}
-		}
-		if(MenuPos==1){
-			if(Selected==0){
-				send_Line1(" --CPR assist-- ");
-				send_Line2("     options    ");	
-				choice=2;
-			}		
-			if(Selected==1){
-				send_Line1("   CPR assist   ");
-				send_Line2("   --options--  ");	
-				choice=3;
+			if(Switch("PG0")){
+				Scroll=Scroll-1;
 			}
-		}
-		if(MenuPos==2){
-			if(Selected==0){
-				send_Line1("   --options--  ");
-				choice=3;
-				send_Line2("     credits    ");	
-			}		
-			if(Selected==1){
-				send_Line1("     options    ");
-				send_Line2("   --credits--  ");	
-				choice=4;
+			if(Scroll>7){
+				Scroll=0;
 			}
+			if(Scroll<0){
+				Scroll=7;
+			}
+			if(Switch("PG3")){
+				ActiveChoice=choice;
+			}
+			Wait=1;
 		}
-		if(MenuPos==3){
-			if(Selected==0){
-				send_Line1("   --credits--  ");
-				choice=4;
-				send_Line2("                ");	
-			}		
+		if(!Switch("PG0")&&!Switch("PG2")){
+			Wait=0;
 		}
-	}
+		if(Scroll==0){
+			send_Line1("--bpm/o2 level--");
+			send_Line2("   CPR assist   ");
+			choice=1;
+		}
+		if(Scroll==1){
+			send_Line1("  bpm/o2 level  ");
+			send_Line2(" --CPR assist-- ");
+			choice=2;
+		}	
+		if(Scroll==2){
+			send_Line1(" --CPR assist-- ");
+			send_Line2("     options    ");
+			choice=2;
+		}	
+		if(Scroll==3){
+			send_Line1("   CPR assist   ");
+			send_Line2("   --options--  ");
+			choice=3;
+		}		
+		if(Scroll==4){
+			send_Line1("   --options--  ");
+			send_Line2("     credits    ");
+			choice=3;
+		}		
+		if(Scroll==5){
+			send_Line1("     options    ");
+			send_Line2("   --credits--  ");
+			choice=4;
+		}	
+		if(Scroll==6){
+			send_Line1("   --credits--  ");
+			send_Line2("                ");
+			choice=4;
+		}	
+	//}
+	//if(ActiveChoice==1){
+	//	send_Line1("BPM:");
+	//	send_Line2("o2:");
+	//}
 }
 	
