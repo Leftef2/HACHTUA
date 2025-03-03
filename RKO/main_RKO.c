@@ -70,7 +70,92 @@ void send_Line2(char* str){
 //		}
 //	}
 //}
-
+int Choice=0;
+void menu(int ScrollLocal){
+	//send_Line1("  bpm/o2 level  ");  Choice=1
+	//send_Line1("   CPR assist   ");  Choice=2
+	//send_Line1("     options    ");  Choice=3
+	//send_Line1("     credits    ");  Choice=4
+	if(ScrollLocal==0){
+		send_Line1("--bpm/o2 level--");
+		send_Line2("   CPR assist   ");
+		Choice=1;
+	}
+	if(ScrollLocal==1){
+		send_Line1("  bpm/o2 level  ");
+		send_Line2(" --CPR assist-- ");
+		Choice=2;
+	}	
+	if(ScrollLocal==2){
+		send_Line1(" --CPR assist-- ");
+		send_Line2("     options    ");
+		Choice=2;
+	}	
+	if(ScrollLocal==3){
+		send_Line1("   CPR assist   ");
+		send_Line2("   --options--  ");
+		Choice=3;
+	}		
+	if(ScrollLocal==4){
+		send_Line1("   --options--  ");
+		send_Line2("     credits    ");
+		Choice=3;
+	}		
+	if(ScrollLocal==5){
+		send_Line1("     options    ");
+		send_Line2("   --credits--  ");
+		Choice=4;
+	}	
+	if(ScrollLocal==6){
+		send_Line1("   --credits--  ");
+		send_Line2("                ");
+		Choice=4;
+	}		
+}
+int MATHS1(int A[360]){
+	int MaxVal=0;
+	int MinVal=100000;
+	int Trig=0;
+	int Times[100];
+	int TempCount=0;
+	int AverageTime=0;
+	for(int I=0;360;I++){
+		if(A[I]<MinVal){
+			MinVal=A[I];
+		}
+		if(A[I]>MaxVal){
+			MaxVal=A[I];
+		}
+	}
+	int Threshold=MinVal+((MaxVal-MinVal)*0.75);
+	for(int I=0;360;I++){
+		if(A[I]>Threshold){
+			if(Trig==0){
+				Times[TempCount]=I;
+				TempCount++;
+				Trig=1;
+			}
+		}
+		else{
+			Trig=0;
+		}
+	}
+	TempCount=0;
+	for(int I=0;100;I++){
+		if(Times[I]>0&&I>0){
+			AverageTime=AverageTime+(Times[I]-Times[I-1]);
+			TempCount++;
+		}
+	}
+	AverageTime=AverageTime/TempCount;
+	TempCount=0;
+	return AverageTime;
+}
+int ActiveChoice=0;
+int Scroll=0;
+int DATA[360];
+int BPM;
+char temp[17];
 int main(void){
 	initLCD();
 	//send_Line1("Loading system...");
@@ -80,29 +165,10 @@ int main(void){
 	createSwitch("PG3");
 	ADC_SETUP("PA0",1);
 	timer_init();
+	menu(Scroll);
 	while(1){
-		;
-	}
-}
-int Counter=0;
-int Counter2=0;
-int Wait=0;
-int Scroll=0;
-int choice=0;
-int ActiveChoice=0;
-int calibrating=1;
-int minSample=10000;
-int maxSample=0;
-char temp[17];
-void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop --
-{
-	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register
-	//send_Line1("  bpm/o2 level  ");  MenuPos=0
-	//send_Line1("   CPR assist   ");  MenuPos=1
-	//send_Line1("     options    ");  MenuPos=2
-	//send_Line1("     credits    ");  MenuPos=3
-	if(ActiveChoice==0){
-		if(Wait==0){
+		if(ActiveChoice==0){
+			while(!Switch("PG0")&&!Switch("PG2")&&!Switch("PG3")){};
 			if(Switch("PG2")){
 				Scroll=Scroll+1;
 			}
@@ -116,92 +182,45 @@ void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop
 				Scroll=6;
 			}
 			if(Switch("PG3")){
-				ActiveChoice=choice;
+				ActiveChoice=Choice;
 			}
-			Wait=1;
+			menu(Scroll);
+			while(Switch("PG0")||Switch("PG2")||Switch("PG3")){};
 		}
-		if(!Switch("PG0")&&!Switch("PG2")){
-			Wait=0;
+		if(ActiveChoice==1){
+			sprintf(temp,"BPM:%1.i|",(int) round(BPM/100));
+			send_Line1(temp);
 		}
-		if(Scroll==0){
-			send_Line1("--bpm/o2 level--");
-			send_Line2("   CPR assist   ");
-			choice=1;
-		}
-		if(Scroll==1){
-			send_Line1("  bpm/o2 level  ");
-			send_Line2(" --CPR assist-- ");
-			choice=2;
-		}	
-		if(Scroll==2){
-			send_Line1(" --CPR assist-- ");
-			send_Line2("     options    ");
-			choice=2;
-		}	
-		if(Scroll==3){
-			send_Line1("   CPR assist   ");
-			send_Line2("   --options--  ");
-			choice=3;
-		}		
-		if(Scroll==4){
-			send_Line1("   --options--  ");
-			send_Line2("     credits    ");
-			choice=3;
-		}		
-		if(Scroll==5){
-			send_Line1("     options    ");
-			send_Line2("   --credits--  ");
-			choice=4;
-		}	
-		if(Scroll==6){
-			send_Line1("   --credits--  ");
-			send_Line2("                ");
-			choice=4;
-		}
-	}		
+	}
+}
+
+int calibrating=1;
+int minSample=10000;
+int maxSample=0;
+int Counter=0;
+int Wait=0;
+int LED3=0;
+int DATAtemp[360];
+void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop --
+{
+	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register	
 	if(ActiveChoice==1){//goes into bpm/o2 mode
 		ADCstartconv(1);
-		if(calibrating==1){
-			send_Line1("BPM:calibrating");
-			send_Line2("o2:calibrating");
-			Counter++;
-			if(ADCout(1)<minSample){
-				minSample=ADCout(1);
-			}
-			if(ADCout(1)>maxSample){
-				maxSample=ADCout(1);
-			}
-			if(Counter>=360){
-				calibrating=0;
-				Counter=0;
-			}
+		Counter++;
+		if(Counter>360){
+			BPM=MATHS1(DATAtemp);
+			Counter=0;
 		}
 		else{
-			int BPMtime;
-			if(0<Counter&&Counter<5){
-				Counter2++;
-			}
-			if(Wait==0){
-				if(ADCout(1)>(minSample+(0.75*(maxSample-minSample)))){
-					Counter++;
-					if(Counter==5){
-						LED_ON("PB0");
-						Counter=0;
-						sprintf(temp,"BPM:%1.i|",(int)round((Counter2*0.1)));
-						send_Line1(temp);
-						Counter2=0;
-					}
-					else{
-						LED_OFF("PB0");
-					}
-					Wait=1;
-				}
-			}
-			if(ADCout(1)<(minSample+(0.5*(maxSample-minSample)))){
-				Wait=0;
-			}
-			//send_Line2("o2:");
+			DATAtemp[Counter]=ADCout(1);
 		}
+	}
+	
+	if(LED3){
+		LED_ON("PB0");
+	}
+	else{
+		LED_OFF("PB0");
 	}
 }
 	
