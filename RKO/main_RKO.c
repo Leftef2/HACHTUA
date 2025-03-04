@@ -112,14 +112,15 @@ void menu(int ScrollLocal){
 		Choice=4;
 	}		
 }
+
 int MATHS1(int A[360]){
 	int MaxVal=0;
-	int MinVal=100000;
+	int MinVal=1000000;
 	int Trig=0;
 	int Times[100];
 	int TempCount=0;
 	int AverageTime=0;
-	for(int I=0;360;I++){
+	for(int I=0;I<360;I++){
 		if(A[I]<MinVal){
 			MinVal=A[I];
 		}
@@ -127,8 +128,12 @@ int MATHS1(int A[360]){
 			MaxVal=A[I];
 		}
 	}
+
+	char temp2[17];
 	int Threshold=MinVal+((MaxVal-MinVal)*0.75);
-	for(int I=0;360;I++){
+	sprintf(temp2,"Threshold:%1.i|",(int) Threshold);
+	send_Line2(temp2);
+	for(int I=0;I<360;I++){
 		if(A[I]>Threshold){
 			if(Trig==0){
 				Times[TempCount]=I;
@@ -141,8 +146,11 @@ int MATHS1(int A[360]){
 		}
 	}
 	TempCount=0;
-	for(int I=0;100;I++){
+	for(int I=0;I<100;I++){
 		if(Times[I]>0&&I>0){
+			if(I>95){//-SOMETHING WRONG HERE
+				LED_ON("PB7");
+			}
 			AverageTime=AverageTime+(Times[I]-Times[I-1]);
 			TempCount++;
 		}
@@ -163,6 +171,8 @@ int main(void){
 	createSwitch("PG0");
 	createSwitch("PG2");
 	createSwitch("PG3");
+	LED_SETUP("PB7");
+	LED_SETUP("PB14");
 	ADC_SETUP("PA0",1);
 	timer_init();
 	menu(Scroll);
@@ -199,14 +209,12 @@ int minSample=10000;
 int maxSample=0;
 int Counter=0;
 int Wait=0;
-int LED3=0;
 int DATAtemp[360];
 void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop --
 {
 	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register	
 	if(ActiveChoice==1){//goes into bpm/o2 mode
 		ADCstartconv(1);
-		Counter++;
 		if(Counter>360){
 			BPM=MATHS1(DATAtemp);
 			Counter=0;
@@ -214,13 +222,7 @@ void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop
 		else{
 			DATAtemp[Counter]=ADCout(1);
 		}
-	}
-	
-	if(LED3){
-		LED_ON("PB0");
-	}
-	else{
-		LED_OFF("PB0");
+		Counter++;
 	}
 }
 	
