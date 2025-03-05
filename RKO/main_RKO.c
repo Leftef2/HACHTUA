@@ -117,9 +117,11 @@ int MATHS1(int A[360]){
 	int MaxVal=0;
 	int MinVal=1000000;
 	int Trig=0;
-	int Times[100];
 	int TempCount=0;
+	int Times[360];
 	int AverageTime=0;
+	char temp2[17];
+
 	for(int I=0;I<360;I++){
 		if(A[I]<MinVal){
 			MinVal=A[I];
@@ -129,42 +131,43 @@ int MATHS1(int A[360]){
 		}
 	}
 
-	char temp2[17];
 	int Threshold=MinVal+((MaxVal-MinVal)*0.75);
 	sprintf(temp2,"Threshold:%1.i|",(int) Threshold);
 	send_Line2(temp2);
 	for(int I=0;I<360;I++){
 		if(A[I]>Threshold){
-			if(Trig==0){
-				Times[TempCount]=I;
-				TempCount++;
-				Trig=1;
-			}
+			Times[I]=1;
 		}
 		else{
-			Trig=0;
+			Times[I]=0;
 		}
 	}
+//	for(int I=0;I<360;I++){
+//		if(Times[I]==1&&Trig==1){
+//			Times[I]=0;
+//		}
+//		if(Times[I]==1&&Trig==0){
+//			Trig=1;
+//		}
+//		if(Times[I]==0){
+//			Trig=0;
+//		}
+//	}
 	TempCount=0;
-	for(int I=0;I<100;I++){
-		if(Times[I]>0&&I>0){
-			if(I>95){//-SOMETHING WRONG HERE
-				LED_ON("PB7");
-			}
-			AverageTime=AverageTime+(Times[I]-Times[I-1]);
-			TempCount++;
-		}
+	for(int I=0;I<360;I++){
+		TempCount=TempCount+Times[I];
 	}
-	AverageTime=AverageTime/TempCount;
-	TempCount=0;
-	return AverageTime;
+	return TempCount;
 }
 int ActiveChoice=0;
 int Scroll=0;
 int DATA[360];
 int BPM;
 char temp[17];
+int LED1=0;
 int main(void){
+	LED_SETUP("PF14");
+	//LED_SETUP("PA5");
 	initLCD();
 	//send_Line1("Loading system...");
 	LED_SETUP("PB0");
@@ -175,6 +178,7 @@ int main(void){
 	LED_SETUP("PB14");
 	ADC_SETUP("PA0",1);
 	timer_init();
+	Init_DAC2();
 	menu(Scroll);
 	while(1){
 		if(ActiveChoice==0){
@@ -198,7 +202,7 @@ int main(void){
 			while(Switch("PG0")||Switch("PG2")||Switch("PG3")){};
 		}
 		if(ActiveChoice==1){
-			sprintf(temp,"BPM:%1.i|",(int) round(BPM/100));
+			sprintf(temp,"BPM:%1.i|",(int) round(BPM));
 			send_Line1(temp);
 		}
 	}
@@ -210,9 +214,22 @@ int maxSample=0;
 int Counter=0;
 int Wait=0;
 int DATAtemp[360];
+char temp2[17];
+int High_Low=0;
 void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop --
 {
-	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register	
+	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register
+	LED1=!LED1;
+	if(LED1==1){
+		LED_ON("PF14");
+		send_dac((1<<11));
+	}
+	else{
+		LED_OFF("PF14");
+		send_dac(0);
+
+	}
+	int TempCount=0;	
 	if(ActiveChoice==1){//goes into bpm/o2 mode
 		ADCstartconv(1);
 		if(Counter>360){
