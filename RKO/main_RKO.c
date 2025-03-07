@@ -35,41 +35,27 @@ void Shortbuzz(void){
 }
 void send_Line1(char* str){
 	cmdLCD(LCD_LINE1);
-	for(int A=0;16;A++){
+	for(int A=0;A<16;A++){
 		if(A<strlen(str)){
 			putLCD(str[A]);
 		}
 		else{
 			putLCD(' ');
-		}
-		if(A==16){
-			break;
 		}
 	}
 }
 void send_Line2(char* str){
 	cmdLCD(LCD_LINE2);
-	for(int A=0;16;A++){
+	for(int A=0;A<16;A++){
 		if(A<strlen(str)){
 			putLCD(str[A]);
 		}
 		else{
 			putLCD(' ');
 		}
-		if(A==16){
-			break;
-		}
 	}
 }
-//void send_Line2(char* str){
-//	cmdLCD(LCD_LINE2);
-//	for(int A=0;strlen(str);A++){
-//		putLCD(str[A]);
-//		if(strlen(str)-1==A){
-//			break;
-//		}
-//	}
-//}
+
 int Choice=0;
 void menu(int ScrollLocal){
 	//send_Line1("  bpm/o2 level  ");  Choice=1
@@ -142,26 +128,16 @@ int MATHS1(int A[360]){
 			Times[I]=0;
 		}
 	}
-//	for(int I=0;I<360;I++){
-//		if(Times[I]==1&&Trig==1){
-//			Times[I]=0;
-//		}
-//		if(Times[I]==1&&Trig==0){
-//			Trig=1;
-//		}
-//		if(Times[I]==0){
-//			Trig=0;
-//		}
-//	}
+
 	TempCount=0;
 	for(int I=0;I<360;I++){
 		TempCount=TempCount+Times[I];
 	}
+	TempCount=TempCount/3;
 	return TempCount;
 }
 int ActiveChoice=0;
 int Scroll=0;
-int DATA[360];
 int BPM;
 char temp[17];
 int LED1=0;
@@ -169,14 +145,14 @@ int main(void){
 	LED_SETUP("PF14");
 	//LED_SETUP("PA5");
 	initLCD();
-	//send_Line1("Loading system...");
+	send_Line1("Loading system...");
 	LED_SETUP("PB0");
 	createSwitch("PG0");
 	createSwitch("PG2");
 	createSwitch("PG3");
 	LED_SETUP("PB7");
 	LED_SETUP("PB14");
-	ADC_SETUP("PA0",1);
+	ADC_SETUP("PC3",1);
 	timer_init();
 	Init_DAC2();
 	menu(Scroll);
@@ -208,16 +184,13 @@ int main(void){
 	}
 }
 
-int calibrating=1;
-int minSample=10000;
-int maxSample=0;
+
 int Counter=0;
-int Wait=0;
 int DATAtemp[360];
-char temp2[17];
-int High_Low=0;
+int Counter2=0;
 void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop --
 {
+	Counter2++;
 	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register
 	LED1=!LED1;
 	if(LED1==1){
