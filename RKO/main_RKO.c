@@ -58,22 +58,22 @@ void send_Line2(char* str){
 
 int Choice=0;
 void menu(int ScrollLocal){
-	//send_Line1("  bpm/o2 level  ");  Choice=1
-	//send_Line1("   CPR assist   ");  Choice=2
+	//send_Line1("      bpm       ");  Choice=1
+	//send_Line1("       o2       ");  Choice=2
 	//send_Line1("     options    ");  Choice=3
 	//send_Line1("     credits    ");  Choice=4
 	if(ScrollLocal==0){
-		send_Line1("--bpm/o2 level--");
-		send_Line2("   CPR assist   ");
+		send_Line1("    --bpm--     ");
+		send_Line2("       o2       ");
 		Choice=1;
 	}
 	if(ScrollLocal==1){
-		send_Line1("  bpm/o2 level  ");
-		send_Line2(" --CPR assist-- ");
+		send_Line1("      bpm       ");
+		send_Line2("     --o2--     ");
 		Choice=2;
 	}	
 	if(ScrollLocal==2){
-		send_Line1(" --CPR assist-- ");
+		send_Line1("     --o2--     ");
 		send_Line2("     options    ");
 		Choice=2;
 	}	
@@ -107,6 +107,7 @@ int MATHS1(int A[360]){
 	int Times[360];
 	int AverageTime=0;
 	char temp2[17];
+	int Wait=0;
 
 	for(int I=0;I<360;I++){
 		if(A[I]<MinVal){
@@ -117,24 +118,29 @@ int MATHS1(int A[360]){
 		}
 	}
 
-	int Threshold=MinVal+((MaxVal-MinVal)*0.75);
-	sprintf(temp2,"Threshold:%1.i|",(int) Threshold);
-	send_Line2(temp2);
+	int Threshold=MinVal+((MaxVal-MinVal)*0.5);
+
 	for(int I=0;I<360;I++){
-		if(A[I]>Threshold){
+		if(A[I]>Threshold&&Wait==0){
 			Times[I]=1;
+			Wait=1;
 		}
 		else{
 			Times[I]=0;
+		}
+		if(A[I+2]<Threshold){
+			Wait=0;
 		}
 	}
 
 	TempCount=0;
 	for(int I=0;I<360;I++){
-		TempCount=TempCount+Times[I];
+		if(Times[I]>0){
+			TempCount=TempCount+1;
+		}
 	}
-	TempCount=TempCount/3;
-	return TempCount;
+
+	return Threshold;
 }
 int ActiveChoice=0;
 int Scroll=0;
@@ -156,6 +162,8 @@ int main(void){
 	timer_init();
 	Init_DAC2();
 	menu(Scroll);
+	LED_ON("PF14");
+	send_dac((1<<11));
 	while(1){
 		if(ActiveChoice==0){
 			while(!Switch("PG0")&&!Switch("PG2")&&!Switch("PG3")){};
@@ -180,6 +188,8 @@ int main(void){
 		if(ActiveChoice==1){
 			sprintf(temp,"BPM:%1.i|",(int) round(BPM));
 			send_Line1(temp);
+			sprintf(temp,"Val:%1.i|",(int) round(ADCout(1)));
+			send_Line2(temp);
 		}
 	}
 }
@@ -190,20 +200,10 @@ int DATAtemp[360];
 int Counter2=0;
 void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop --
 {
-	Counter2++;
 	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register
-	LED1=!LED1;
-	if(LED1==1){
-		LED_ON("PF14");
-		send_dac((1<<11));
-	}
-	else{
-		LED_OFF("PF14");
-		send_dac(0);
 
-	}
 	int TempCount=0;	
-	if(ActiveChoice==1){//goes into bpm/o2 mode
+	if(ActiveChoice==1){//goes into bpm mode
 		ADCstartconv(1);
 		if(Counter>360){
 			BPM=MATHS1(DATAtemp);
