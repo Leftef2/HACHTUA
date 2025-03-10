@@ -1,6 +1,5 @@
 #define DAC_pin 5
 #include "my_dac.h"
-#include "wait.h"
 
 #include <math.h>
 void Init_DAC2(void)
@@ -22,7 +21,11 @@ RCC->APB1ENR|=RCC_APB1ENR_DACEN;
 //Enable the DAC
 DAC->CR|=DAC_CR_EN2;
 }
-
+void send_dac(int a){
+	DAC->DHR12R2=a;
+}
+	
+	
 int m;
 void Ramp_Output (void){
 	while(1){
@@ -34,22 +37,22 @@ void Ramp_Output (void){
 		}
 	}}
 
-int q;
-int w;	
-	void Square_Output (void){
-		while (1){
-			q=0;
-			DAC->DHR12R2=q;
-			Delay_ms(1);
-			w=3000;
-			DAC->DHR12R2=w;
-			Delay_ms(1);
-		}
-		}
-	int r;
-			void DC_level(void){
-				r=3000;
-			}
+//int q;
+//int w;	
+//	void Square_Output (void){
+//		while (1){
+//			q=0;
+//			DAC->DHR12R2=q;
+//			Delay_ms(1);
+//			w=3000;
+//			DAC->DHR12R2=w;
+//			Delay_ms(1);
+//		}
+//		}
+//	int r;
+//			void DC_level(void){
+//				r=3000;
+//			}
 				
 //			void Sin_Output (void){
 //	

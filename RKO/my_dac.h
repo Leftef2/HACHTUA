@@ -4,9 +4,10 @@
 #include <math.h>
 
 void Init_DAC2(void);
-void DC_level(void);
+void send_dac(int a);
+//void DC_level(void);
 void Ramp_Output (void);
-void Square_Output (void);
-void Sin_Output (void);
-void swatch (float);
+//void Square_Output (void);
+//void Sin_Output (void);
+//void swatch (float);
 #endif

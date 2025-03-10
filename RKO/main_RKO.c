@@ -12,185 +12,174 @@
 #include "my_buzzer.h"
 #include "timers.h"
 #include "my_dac.h"
-//molex
-//red 1
-//black 2
-//blue 3
-//pink 4
-//yellow 5
-//green 6
+void Shortbuzz(void){
+	int a=0;
+	int buz=0;
+	int time=0;
+	while(a==0){
+		buz++;
+		time++;
+		if(buz>400){
+			buz=0;
+		}
+		if(buz>200){
+			LED_ON("PB13");
+		}
+		else{
+			LED_OFF("PB13");
+		}
+		if(time>200000){
+			break;
+		}
+	}	
+}
 void send_Line1(char* str){
 	cmdLCD(LCD_LINE1);
-	for(int A=0;strlen(str)-1;A++){
-		putLCD(str[A]);
-		if(A==16){
-			break;
+	for(int A=0;A<18;A++){
+		if(A<strlen(str)){
+			putLCD(str[A]);
+		}
+		else{
+			putLCD(' ');
 		}
 	}
 }
 void send_Line2(char* str){
 	cmdLCD(LCD_LINE2);
-	for(int A=0;strlen(str)-1;A++){
-		putLCD(str[A]);
-		if(strlen(str)-1==A){
-			break;
+	for(int A=0;A<18;A++){
+		if(A<strlen(str)){
+			putLCD(str[A]);
+		}
+		else{
+			putLCD(' ');
 		}
 	}
 }
-int Menu=0;
+
+int Choice=0;
+void menu(int ScrollLocal){
+	//send_Line1("      bpm       ");  Choice=1
+	//send_Line1("       o2       ");  Choice=2
+	//send_Line1("     options    ");  Choice=3
+	//send_Line1("     credits    ");  Choice=4
+	if(ScrollLocal==0){
+		send_Line1("    --bpm--     ");
+		send_Line2("       o2       ");
+		Choice=1;
+	}
+	if(ScrollLocal==1){
+		send_Line1("      bpm       ");
+		send_Line2("     --o2--     ");
+		Choice=2;
+	}	
+	if(ScrollLocal==2){
+		send_Line1("     --o2--     ");
+		send_Line2("     options    ");
+		Choice=2;
+	}	
+	if(ScrollLocal==3){
+		send_Line1("   CPR assist   ");
+		send_Line2("   --options--  ");
+		Choice=3;
+	}		
+	if(ScrollLocal==4){
+		send_Line1("   --options--  ");
+		send_Line2("     credits    ");
+		Choice=3;
+	}		
+	if(ScrollLocal==5){
+		send_Line1("     options    ");
+		send_Line2("   --credits--  ");
+		Choice=4;
+	}	
+	if(ScrollLocal==6){
+		send_Line1("   --credits--  ");
+		send_Line2("                ");
+		Choice=4;
+	}		
+}
+int Convert(int A){
+	return A*0.5;
+}
+int ActiveChoice=0;
+int Scroll=0;
+int BPM;
+char temp[17];
+int LED1=0;
 int main(void){
-	timer_init();
+	LED_SETUP("PF14");
+	//LED_SETUP("PA5");
 	initLCD();
-	LED_SETUP("PD14");
-	LED_SETUP("PB13");
 	send_Line1("Loading system...");
+	LED_SETUP("PB0");
 	createSwitch("PG0");
 	createSwitch("PG2");
 	createSwitch("PG3");
-	ADC_SETUP("PA0",1);
-	Menu=1;
+	LED_SETUP("PB0");
+	LED_SETUP("PB14");
+	ADC_SETUP("PC3",1);
+	timer_init();
+	Init_DAC2();
+	menu(Scroll);
+	LED_ON("PF14");
+	send_dac((1<<11));
 	while(1){
-		;
+		if(ActiveChoice==0){
+			while(!Switch("PG0")&&!Switch("PG2")&&!Switch("PG3")){};
+			if(Switch("PG2")){
+				Scroll=Scroll+1;
+			}
+			if(Switch("PG0")){
+				Scroll=Scroll-1;
+			}
+			if(Scroll>=7){
+				Scroll=0;
+			}
+			if(Scroll<0){
+				Scroll=6;
+			}
+			if(Switch("PG3")){
+				ActiveChoice=Choice;
+			}
+			menu(Scroll);
+			while(Switch("PG0")||Switch("PG2")||Switch("PG3")){};
+		}
+		if(ActiveChoice==1){
+			sprintf(temp,"BPM:%1.i|",(int) round(BPM));
+			send_Line1(temp);
+		}
 	}
 }
-int A=0;
-int Counter;
-int MenuPos=0;
-int Wait=0;
-int Selected=0;
-int Mode=0;
-int ActiveMode=0;
-int BPMcount=0;
+
+
+int Counter=0;
+int DATAtemp[360];
+int DATA[360];
+int Counter2=0;
+int lastNum=0;
+int Timer1=0;
+int total=0;
 void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop --
 {
-	A=!A;
-	if(A){
-		set_LCD_E();
-	}
-	else{
-		clr_LCD_E();
-	}
-		
 	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register
-	if(Wait==0){
-		if(Switch("PG2")){
-			if(Selected==0&&MenuPos==3){
-				MenuPos=0;
-				Selected=0;
-			}
-			else if(Selected<1){
-				Selected=1;
-			}
-			else{
-				MenuPos=MenuPos+1;
-				Selected=0;
-			}
-			Wait=1;
-		}
-		if(Switch("PG0")){
-			if(Selected==0&&MenuPos==0){
-				MenuPos=3;
-				Selected=0;
-			}
-			else if(Selected>0){
-				Selected=0;
-			}
-			else{
-				MenuPos=MenuPos-1;
-				Selected=1;
-			}
-			Wait=1;
-		}
+
+	if(Timer1==1){
+		Counter++;
 	}
-	if(!Switch("PG0")&&!Switch("PG2")){
-		Wait=0;
-	}
-	//send_Line1("  bpm/o2 level  ");  MenuPos=0
-	//send_Line1("   CPR assist   ");  MenuPos=1
-	//send_Line1("     options    ");  MenuPos=2
-	//send_Line1("     credits    ");  MenuPos=3
-		if(Menu){
-			if(MenuPos==0){
-				if(Selected==0){
-					send_Line1("--bpm/o2 level--");
-					Mode=1;
-					send_Line2("   CPR assist   ");	
-				}		
-				if(Selected==1){
-					send_Line1("  bpm/o2 level  ");
-					send_Line2(" --CPR assist-- ");
-					Mode=2;				
-				}
-			}
-			if(MenuPos==1){
-				if(Selected==0){
-					send_Line1(" --CPR assist-- ");
-					send_Line2("     options    ");	
-					Mode=2;	
-				}		
-				if(Selected==1){
-					send_Line1("   CPR assist   ");
-					send_Line2("   --options--  ");	
-					Mode=3;	
-				}
-			}
-			if(MenuPos==2){
-				if(Selected==0){
-					send_Line1("   --options--  ");
-					send_Line2("     credits    ");	
-					Mode=3;	
-				}		
-				if(Selected==1){
-					send_Line1("     options    ");
-					send_Line2("   --credits--  ");	
-					Mode=4;	
-				}
-			}
-			if(MenuPos==3){
-				if(Selected==0){
-					send_Line1("   --credits--  ");
-					send_Line2("                ");	
-					Mode=4;	
-				}		
-			}		
-		
-	}
-	if(Switch("PG1")){
-		Menu=1;
-	}
-	if(Switch("PG3")){
-		Menu=0;
-	}
-	if(Menu==0){
-		//send_Line1("                ");
-		send_Line2("                ");
-		if(Mode==1){
-			ADCstartconv(1);
-			char Sout[16];
-			sprintf(Sout,"BPM = %5.i",ADCout(1));
-			send_Line1(Sout);
+
+	
+	if(ActiveChoice==1){		
+		ADCstartconv(1);
+		if(lastNum>ADCout(1)){
+			Timer1=1;
+			LED_ON("PB0");
 		}
-		if(Mode==2){
-			BPMcount++;
-			Counter++;
-			if(BPMcount<10){
-				if(A){
-					LED_ON("PB13");
-				}
-				else{
-					LED_OFF("PB13");
-				}
-			}
-			if(BPMcount>69){
-				BPMcount=0;
-			}
-		}
-		if(Mode==3){
-			//--placeholder Options--
-		}
-		if(Mode==4){
-			send_Line1("we're not racist");
-			send_Line2("we just hate you");
+		else{
+			LED_OFF("PB0");
+			Timer1=0;
+			BPM=ADCout(1);
+			Counter=0;
+			lastNum=0;
 		}
 	}
 }

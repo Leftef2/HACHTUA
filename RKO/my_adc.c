@@ -33,6 +33,7 @@ void ADC_SETUP(char* str, int adc){//e.g. PA0
 		ADC1->SQR1&=~ADC_SQR1_L;						//set number of conversions per sequence to 1
 		ADC1->SQR3&=~ADC_SQR3_SQ1;					//clear channel select bits
 		ADC1->SQR3|=getNum(str);					//set channel
+		ADC1->CR1&=~(3u<25);
 		ADC1->CR2|=ADC_CR2_ADON;						//enable ADC
 	}
 	if(adc==2){														//if the ADC selected by user is 2
@@ -72,5 +73,6 @@ int ADCout(int adc){
 	if(adc==3){
 		return ADC3->DR;
 	}
+
 	return 0;
 }
