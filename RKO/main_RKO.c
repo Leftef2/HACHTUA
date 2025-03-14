@@ -98,55 +98,26 @@ void menu(int ScrollLocal){
 		Choice=4;
 	}		
 }
-
-int MATHS1(int A[360]){
-	int MaxVal=0;
-	int MinVal=1000000;
-	int Trig=0;
-	int TempCount=0;
-	int Times[360];
-	int AverageTime=0;
-	char temp2[17];
-	int Wait=0;
-
-	for(int I=0;I<360;I++){
-		if(A[I]<MinVal){
-			MinVal=A[I];
-		}
-		if(A[I]>MaxVal){
-			MaxVal=A[I];
-		}
+int RunningAverageStore[201];
+int RunningAverage(int A){
+	int Average=0;
+	for(int I=0;I<200;I++){
+		RunningAverageStore[I]=RunningAverageStore[I+1];
 	}
-
-	int Threshold=MinVal+((MaxVal-MinVal)*0.5);
-
-	for(int I=0;I<360;I++){
-		if(A[I]>Threshold&&Wait==0){
-			Times[I]=1;
-			Wait=1;
-		}
-		else{
-			Times[I]=0;
-		}
-		if(A[I+2]<Threshold){
-			Wait=0;
-		}
+	RunningAverageStore[200]=A;
+	for(int I=0;I<200;I++){
+		Average=Average+RunningAverageStore[I];
 	}
-
-	TempCount=0;
-	for(int I=0;I<360;I++){
-		if(Times[I]>0){
-			TempCount=TempCount+1;
-		}
-	}
-
-	return Threshold;
+	Average=Average/200;
+		
+	return Average;
 }
 int ActiveChoice=0;
 int Scroll=0;
 int BPM;
 char temp[17];
 int LED1=0;
+int A=0;
 int main(void){
 	LED_SETUP("PF14");
 	//LED_SETUP("PA5");
@@ -158,7 +129,7 @@ int main(void){
 	createSwitch("PG3");
 	LED_SETUP("PB7");
 	LED_SETUP("PB14");
-	ADC_SETUP("PC3",1);
+	ADC_SETUP("PA4",1);
 	timer_init();
 	Init_DAC2();
 	menu(Scroll);
@@ -186,7 +157,7 @@ int main(void){
 			while(Switch("PG0")||Switch("PG2")||Switch("PG3")){};
 		}
 		if(ActiveChoice==1){
-			sprintf(temp,"BPM:%1.i|",(int) round(BPM));
+			sprintf(temp,"BPM:%1.i|",A);
 			send_Line1(temp);
 			sprintf(temp,"Val:%1.i|",(int) round(ADCout(1)));
 			send_Line2(temp);
@@ -196,23 +167,29 @@ int main(void){
 
 
 int Counter=0;
-int DATAtemp[360];
-int Counter2=0;
-void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 120 FPS Loop --
+int ClockEnable=0;
+int FlipFlop=0;
+void TIM2_IRQHandler(void)			//TIMER 2 INTERRUPT SERVICE ROUTINE -- 20Hz Loop --
 {
+	
 	TIM2->SR&=~TIM_SR_UIF;				//clear interrupt flag in status register
-
-	int TempCount=0;	
-	if(ActiveChoice==1){//goes into bpm mode
+	if(ActiveChoice==1){
+		if(ClockEnable==1){
+			Counter++;
+		}
+		A=RunningAverage(ADCout(1));		
 		ADCstartconv(1);
-		if(Counter>360){
-			BPM=MATHS1(DATAtemp);
-			Counter=0;
+		if(ADCout(1)>A){
+			if(FlipFlop==0){
+				BPM=Counter;
+				Counter=0;
+				ClockEnable=!ClockEnable;
+				FlipFlop=1;
+			}
 		}
 		else{
-			DATAtemp[Counter]=ADCout(1);
+			FlipFlop=0;
 		}
-		Counter++;
 	}
 }
 	
