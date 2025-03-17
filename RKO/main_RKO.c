@@ -33,15 +33,7 @@ void Shortbuzz(void){
 		}
 	}	
 }
-//void menu_debounce_function(void)         //blocking delay for LCD, argument is approximate number of micro-seconds to delay
-//{
-//	unsigned char i;
-//	int Time=5000;
-//	while(Time--)
-//	{
-//		for(i=0; i<SystemCoreClock/4000000; i++){__NOP();}
-//	}
-//}
+
 void send_Line1(char* str){
 	cmdLCD(LCD_LINE1);
 	for(int A=0;A<16;A++){
@@ -145,8 +137,10 @@ int main(void){
 	send_Line1("Loading system...");
 	LED_SETUP("PB0");
 	createSwitch("PG0");
+	createSwitch("PG1");
 	createSwitch("PG2");
 	createSwitch("PG3");
+	createSwitch("PB13");
 	LED_SETUP("PB7");
 	LED_SETUP("PB14");
 	ADC_SETUP("PA4",1);
@@ -157,27 +151,31 @@ int main(void){
 	send_dac((1<<11));
 	while(1){
 		if(ActiveChoice==0){
-			while(!Switch("PG0")&&!Switch("PG2")&&!Switch("PG3")){};
-			menu_debounce_function();
-				if(Switch("PG2")){
+			while(!Switch("PG0")&&!Switch("PG1")&&!Switch("PG2")&&!Switch("PG3")){};
+			if(Switch("PG2")){
 				Scroll=Scroll+1;
 			}
 			if(Switch("PG0")){
 				Scroll=Scroll-1;
 			}
-			if(Scroll>=9){
+			if(Scroll>8){
 				Scroll=0;
 			}
 			if(Scroll<0){
-				Scroll=6;
+				Scroll=8;
 			}
 			if(Switch("PG3")){
 				ActiveChoice=Choice;
 			}
 			menu(Scroll);
-			while(Switch("PG0")||Switch("PG2")||Switch("PG3")){};
+			menu_debounce_function();
 		}
 		if(ActiveChoice==1){
+			if(Switch("PG1")){
+				menu_debounce_function();
+				ActiveChoice=0;
+				menu(Choice);
+			}
 			sprintf(temp,"BPM:%1.i|",A);
 			send_Line1(temp);
 			sprintf(temp,"Val:%1.i|",(int) round(ADCout(1)));
