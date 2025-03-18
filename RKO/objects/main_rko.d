@@ -9,8 +9,6 @@
   C:\Keil_v5\ARM\Pack\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h \
   lcd.h \
   C:\Keil_v5\ARM\Pack\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h my_adc.h my_led.h \
-  my_functions.h usart.h my_switch.h my_buzzer.h timers.h my_dac.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h my_adc.h my_functions.h \
+  usart.h my_switch.h my_buzzer.h timers.h my_dac.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h

@@ -3,7 +3,7 @@
 #include <stm32f4xx.h>
 #include <math.h>
 
-void Init_DAC2(void);
+void init_DAC(void);
 void send_dac(int a);
 //void DC_level(void);
 void Ramp_Output (void);

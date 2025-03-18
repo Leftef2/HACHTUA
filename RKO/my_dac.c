@@ -2,7 +2,7 @@
 #include "my_dac.h"
 
 #include <math.h>
-void Init_DAC2(void)
+void init_DAC(void)
 {
 	
 //	float f = sin(2*3.14*1.0*0);
