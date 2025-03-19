@@ -46,10 +46,16 @@ int getNum(char* str){//creates a function that returns the pin number inputted 
 	}
 }
 
-void menu_debounce(void)         //blocking delay for LCD, argument is approximate number of micro-seconds to delay
+void debounce(void)         //blocking delay for startup splashscreen
 {
 	for(int i=0; i<13000000; i++){__NOP();}
 }
+
+void menu_debounce(void)         //blocking delay for LCD
+{
+	for(int i=0; i<600000; i++){__NOP();}
+}
+
 
 void Shortbuzz(void){
 	int buz=0;
@@ -77,7 +83,11 @@ void init(void){
 	createSwitch("PG1");
 	createSwitch("PG2");
 	createSwitch("PG3");
+	LED_SETUP("PB13");
 	init_DAC();
 	ADC_SETUP("PA4",1);
 	initLCD();
+	timer_init();
+	send_Line1("Loading system..");
+	debounce();
 }

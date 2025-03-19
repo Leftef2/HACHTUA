@@ -9,10 +9,16 @@
 #include "my_buzzer.h"
 #include "timers.h"
 #include "my_dac.h"
+#include "my_led.h"
 #define RunAvSampCount 100  //micro (find and replace)
 
 //global variables go here
 int Choice;
+int RunAvStore[(RunAvSampCount+1)];
+int FlipFlop=0;
+int Timer_counter;//globals variable for data storage reasons
+
+int val=0;
 
 void menu(int ScrollLocal){//when this function is ran, it will send the correct option to LCD
 	//send_Line1("      bpm       ");  Choice=1
@@ -68,10 +74,11 @@ void menu(int ScrollLocal){//when this function is ran, it will send the correct
 	}
 }
 
-int RunAvStore[(RunAvSampCount+1)];
-
-int MATHS1_RunningAverage(int A){
+int MATHS1_RunningAverage(int A){//this will be called every 10ms
 	int Average=0;
+	int returnVal=0;
+	int Timer_on;
+	int Is_line_on_graph_going_up;
 	
 	for(int I=0;I<100;I++){
 		RunAvStore[I]=RunAvStore[I+1];//Move all the values of the array left by 1 AND LEAVE A SPACE AT THE END e.g. [2,3,4,5,6, ];
@@ -84,8 +91,25 @@ int MATHS1_RunningAverage(int A){
 	}
 	
 	Average=Average/RunAvSampCount;//divide by how many samples took
-	return Average;
+	
+	if(A>(Average+1000)){//FUTURE ME - ISSUE IS HERE
+		Is_line_on_graph_going_up=1;
+	}
+
+	if(Is_line_on_graph_going_up){
+		FlipFlop=!FlipFlop;
+	}
+	if(FlipFlop==1){
+		Timer_counter++;
+	}
+	else{
+		returnVal=Timer_counter;
+		Timer_counter=0;
+	}
+	
+	return returnVal;
 }
+
 
 int ActiveChoice=0;
 int Scroll=0;
@@ -93,9 +117,7 @@ int BPM;
 
 int main(void){
 	init();//Initialize a bunch of stuff
-	send_Line1("Loading system..");
-	menu_debounce();
-	menu(0);
+	menu(0);//after startup splashscreen, go to menu
 	while(1){
 		if(ActiveChoice==0){
 			while(!Switch("PG0")&&!Switch("PG1")&&!Switch("PG2")&&!Switch("PG3")){};//wait for all switch not to be pressed
@@ -116,7 +138,6 @@ int main(void){
 			}
 			menu(Scroll);
 			menu_debounce();
-			//menu_debounce();
 		}
 		if(ActiveChoice==1){
 			if(Switch("PG1")){
@@ -124,13 +145,13 @@ int main(void){
 				ActiveChoice=0;//makes "option" variable go to menu
 				menu(Choice);
 			}
+
 			char temp[17];//makes a char array which is preassigned with "space"
 			sprintf(temp,"BPM:%1.i|",BPM);
 			send_Line1(temp);
-			sprintf(temp,"Val:%1.i|",(int) round(ADCout(1)));
+			sprintf(temp,"Val:%1.i|",val);
 			send_Line2(temp);
 		}
-		menu(Scroll);
 	}
 }
 
@@ -138,7 +159,9 @@ int main(void){
 void TIM2_IRQHandler(void)// -- 10ms Loop --
 {
 	TIM2->SR&=~TIM_SR_UIF;//clear interrupt flag in status register
-	
+	LED_SETUP("PB14");
+	LED_ON("PB14");
+	val=ADCout(1);
 	if(ActiveChoice==1){//if in "bpm" mode
 		BPM=MATHS1_RunningAverage(ADCout(1));//Do the maths (send a sample every x ms) and send it to display (via global variable)
 		ADCstartconv(1);//start conversion (for next loop);
