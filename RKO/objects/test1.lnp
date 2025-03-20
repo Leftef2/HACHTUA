@@ -6,7 +6,6 @@
 ".\objects\my_functions.o"
 ".\objects\usart.o"
 ".\objects\my_switch.o"
-".\objects\my_buzzer.o"
 ".\objects\timers.o"
 ".\objects\my_dac.o"
 ".\objects\startup_stm32f429xx.o"

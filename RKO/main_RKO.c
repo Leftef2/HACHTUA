@@ -6,18 +6,19 @@
 #include "my_functions.h"
 #include "usart.h"
 #include "my_switch.h"
-#include "my_buzzer.h"
 #include "timers.h"
 #include "my_dac.h"
 #include "my_led.h"
 #define RunAvSampCount 100  //micro (find and replace)
+
+//BPM valid from 0.4Hz
 
 //global variables go here
 int Choice;
 int RunAvStore[(RunAvSampCount+1)];
 int FlipFlop=0;
 int Timer_counter;//globals variable for data storage reasons
-
+int TimerControlStore=0;
 int val=0;
 
 void menu(int ScrollLocal){//when this function is ran, it will send the correct option to LCD
@@ -75,10 +76,11 @@ void menu(int ScrollLocal){//when this function is ran, it will send the correct
 }
 
 int MATHS1_RunningAverage(int A){//this will be called every 10ms
-	int Average=0;
-	int returnVal=0;
-	int Timer_on;
+	int Average;
+	int Counter;
 	int Is_line_on_graph_going_up;
+	int ReturnVal=0;
+	
 	
 	for(int I=0;I<100;I++){
 		RunAvStore[I]=RunAvStore[I+1];//Move all the values of the array left by 1 AND LEAVE A SPACE AT THE END e.g. [2,3,4,5,6, ];
@@ -90,24 +92,32 @@ int MATHS1_RunningAverage(int A){//this will be called every 10ms
 		Average=Average+RunAvStore[I];//add up all values in store
 	}
 	
-	Average=Average/RunAvSampCount;//divide by how many samples took
+	int Tolerance=500;
 	
-	if(A>(Average+1000)){//FUTURE ME - ISSUE IS HERE
+	Average=Average/RunAvSampCount;//divide by how many samples took
+	if(A-Tolerance<Average){//is "line" going down (tolerance is 10)
+		Is_line_on_graph_going_up=0;
+	}	
+	if(A+Tolerance>Average){//is "line" going up (tolerance is 10)
 		Is_line_on_graph_going_up=1;
 	}
-
-	if(Is_line_on_graph_going_up){
-		FlipFlop=!FlipFlop;
+	
+	if(Is_line_on_graph_going_up&&(A+Tolerance>Average)){//if the line is going up, flip the switch that controls the timer
+		TimerControlStore=0;
 	}
-	if(FlipFlop==1){
-		Timer_counter++;
+	if(Is_line_on_graph_going_up==0&&(A-Tolerance<Average)){
+		TimerControlStore=1;
+	}
+
+	if(TimerControlStore==0){//when A passes above threshold
+		Counter++;
 	}
 	else{
-		returnVal=Timer_counter;
-		Timer_counter=0;
+		Counter=0;
+		ReturnVal=Counter;
 	}
 	
-	return returnVal;
+	return TimerControlStore;//return return value
 }
 
 

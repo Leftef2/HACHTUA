@@ -420,11 +420,6 @@
               <FilePath>.\my_switch.c</FilePath>
             </File>
             <File>
-              <FileName>my_buzzer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\my_buzzer.c</FilePath>
-            </File>
-            <File>
               <FileName>timers.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\timers.c</FilePath>

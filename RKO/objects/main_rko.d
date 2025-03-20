@@ -10,5 +10,5 @@
   lcd.h \
   C:\Keil_v5\ARM\Pack\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h my_adc.h my_functions.h \
-  usart.h my_switch.h my_buzzer.h timers.h my_dac.h \
+  usart.h my_switch.h timers.h my_dac.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h my_led.h
