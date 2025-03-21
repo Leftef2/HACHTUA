@@ -20,6 +20,10 @@ int FlipFlop=0;
 int Timer_counter;//globals variable for data storage reasons
 int TimerControlStore=0;
 int val=0;
+int CounterEnable=0;
+int ActiveChoice=0;
+int Scroll=0;
+int BPM;
 
 void menu(int ScrollLocal){//when this function is ran, it will send the correct option to LCD
 	//send_Line1("      bpm       ");  Choice=1
@@ -75,55 +79,55 @@ void menu(int ScrollLocal){//when this function is ran, it will send the correct
 	}
 }
 
+
+
 int MATHS1_RunningAverage(int A){//this will be called every 10ms
 	int Average;
 	int Counter;
-	int Is_line_on_graph_going_up;
-	int ReturnVal=0;
+	int Is_Above_Peak;
+	int ReturnVal;
 	
-	
-	for(int I=0;I<100;I++){
+	//-AVERAGING-:
+	for(int I=0;I<RunAvSampCount;I++){
 		RunAvStore[I]=RunAvStore[I+1];//Move all the values of the array left by 1 AND LEAVE A SPACE AT THE END e.g. [2,3,4,5,6, ];
 	}
 	
 	RunAvStore[RunAvSampCount]=A;//takes the value (given by the adc) and adds to store
 	
-	for(int I=0;I<100;I++){
+	for(int I=0;I<RunAvSampCount;I++){
 		Average=Average+RunAvStore[I];//add up all values in store
 	}
 	
 	int Tolerance=500;
 	
+	// Is current sample above the allowable threshold?:
+	
 	Average=Average/RunAvSampCount;//divide by how many samples took
 	if(A-Tolerance<Average){//is "line" going down (tolerance is 10)
-		Is_line_on_graph_going_up=0;
+		Is_Above_Peak=0;
 	}	
 	if(A+Tolerance>Average){//is "line" going up (tolerance is 10)
-		Is_line_on_graph_going_up=1;
+		Is_Above_Peak=1;
 	}
 	
-	if(Is_line_on_graph_going_up&&(A+Tolerance>Average)){//if the line is going up, flip the switch that controls the timer
-		TimerControlStore=0;
-	}
-	if(Is_line_on_graph_going_up==0&&(A-Tolerance<Average)){
+	//-If above allowable threshold:
+	
+	if(Is_Above_Peak&&TimerControlStore==0){//if above threshold and Counter is NOT COUNTING
 		TimerControlStore=1;
 	}
-
-	if(TimerControlStore==0){//when A passes above threshold
-		Counter++;
-	}
-	else{
-		Counter=0;
-		ReturnVal=Counter;
+	if(!Is_Above_Peak&&TimerControlStore==1){//if above threshold and Counter is NOT COUNTING
+		TimerControlStore=0;
 	}
 	
-	return TimerControlStore;//return return value
+	if(TimerControlStore){
+		Counter++;
+	}
+	ReturnVal=10;
+		
+	return ReturnVal;//return return value
 }
 
 
-int ActiveChoice=0;
-int Scroll=0;
-int BPM;
 
 int main(void){
 	init();//Initialize a bunch of stuff
@@ -171,7 +175,7 @@ void TIM2_IRQHandler(void)// -- 10ms Loop --
 	TIM2->SR&=~TIM_SR_UIF;//clear interrupt flag in status register
 	LED_SETUP("PB14");
 	LED_ON("PB14");
-	val=ADCout(1);
+
 	if(ActiveChoice==1){//if in "bpm" mode
 		BPM=MATHS1_RunningAverage(ADCout(1));//Do the maths (send a sample every x ms) and send it to display (via global variable)
 		ADCstartconv(1);//start conversion (for next loop);
