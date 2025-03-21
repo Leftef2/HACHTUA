@@ -15,3 +15,4 @@ void timer_init(void){
 	SystemCoreClockUpdate();			// Update SystemCoreClock
 
 }
+
