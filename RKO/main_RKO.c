@@ -16,20 +16,23 @@
 //global variables go here
 int Choice;
 int RunValStore[(RunAvSampCount+1)];
-int FlipFlop=0;
-int Timer_counter;//globals variable for data storage reasons
-int TimerControlStore;
-int val=0;
+int FlipFlop=0; //globals variable for data storage reasons
 int CounterEnable=0;
 int ActiveChoice=0;
 int Scroll=0;
 int CounterSwitch=0;
-int Maths_counter;
 int LineHasGoneUp=0;
+float Counter;
+int Counter2;
+int Counter3;
+int StopLoop=0;
+int Average;
+int AverageVal;
+char temp[17];//makes a char array which is preassigned with "space"
 
 void menu(int ScrollLocal){//when this function is ran, it will send the correct option to LCD
 	//send_Line1("      bpm       ");  Choice=1
-	//send_Line1("       o2       ");  Choice=2
+	//send_Line1("       o2       ");  Choice=2   send_Line1("       o2       ");  Choice=2
 	//send_Line1("     options    ");  Choice=3
 	//send_Line1("   CPR assist   ");  Choice=4
 	//send_Line1("    credits     ");  Choice=5
@@ -81,76 +84,76 @@ void menu(int ScrollLocal){//when this function is ran, it will send the correct
 	}
 }
 
-
+//things to do:
+//ADC voltage conversion (and do the tolerance stuff)
+//PSC ARR calcs and put them in menu
+//SPI
+//USART
+//i2C
+//led array
 
 void MATHS1(int A){//this will be called every 10ms
-	int Average;
-	int Counter;
 	int Is_Above_Threshold;
-	int BPM;
 	int MaxSamp=0;
 	int MinSamp=10000;
 	int Temp;
 	float Tolerance;
-	char temp[17];//makes a char array which is preassigned with "space"
 	
-	float Gain=1;
+	int Tune=15;
 	
-	Maths_counter++;
-	//-AVERAGING-:
 	for(int I=0;I<RunAvSampCount;I++){//run through all samples
 		RunValStore[I]=RunValStore[I+1];//Move all the values of the array left by 1 AND LEAVE A SPACE AT THE END e.g. [2,3,4,5,6, ];
 	}
 	
 	RunValStore[RunAvSampCount]=A;//takes the value (given by the adc) and the value to the end of store
 	
-	for(int I=0;I<RunAvSampCount;I++){
-		Temp=Temp+RunValStore[I];//add up all values in store
-	}
-	if(Maths_counter>RunAvSampCount){
-		Average=Temp/RunAvSampCount;
-	}
-	Temp=0;
+//	for(int I=0;I<RunAvSampCount;I++){
+//		Temp=Temp+RunValStore[I];//add up all values in store
+//	}
+//	Average=Temp/RunAvSampCount;
+//	Temp=0;
+	
 	
 	//get max/min values to apply to the gain of tolerance value
-	for(int I=0;I<RunAvSampCount;I++){
-		if(RunValStore[I]<MinSamp){
-			MinSamp=RunValStore[I];
-		}
-		if(RunValStore[I]>MaxSamp){
-			MaxSamp=RunValStore[I];
-		}		
-	}
-	Tolerance=((MaxSamp-MinSamp)/10000)*Gain;
-	Temp=0;
-	Tolerance=0.95;
-	// Is current sample above the allowable threshold?:
+//	for(int I=0;I<RunAvSampCount;I++){
+//		if(RunValStore[I]<MinSamp){
+//			MinSamp=RunValStore[I];
+//		}
+//		if(RunValStore[I]>MaxSamp){
+//			MaxSamp=RunValStore[I];
+//		}		
+//	}
+//	Tolerance=((MaxSamp-MinSamp)/10000)*Gain;
 
-	if(RunValStore[RunAvSampCount-1]<(RunValStore[RunAvSampCount]-15)){//is last value less than current (line going up)
+	if(RunValStore[RunAvSampCount-1]<(RunValStore[RunAvSampCount]-Tune)){//is last value less than current (line going up)
 		LineHasGoneUp=1;
 	}
 	
-	if((RunValStore[RunAvSampCount-1]>(RunValStore[RunAvSampCount])+15)&&LineHasGoneUp==1){
+	else if((RunValStore[RunAvSampCount-1]>(RunValStore[RunAvSampCount])+Tune)&&LineHasGoneUp==1){
 		CounterSwitch=!CounterSwitch;
 		LineHasGoneUp=0;
 	}
 	
-	
 	if(CounterSwitch){
 		LED_ON("PB14");
+		StopLoop=1;
 		Counter++;
 	}
-	else{
+	else if(StopLoop==1){
+		Shortbuzz();
 		LED_OFF("PB14");
-		BPM=Counter;
+		int BPM=(int)round((1.0f/(Counter/100))*60);
+		Average=Average+BPM;
+		Counter3++;
+		StopLoop=0;
 		sprintf(temp,"BPM:%1.i|",BPM);
 		send_Line1(temp);
-		//sprintf(temp,"out:%1.i|",ADCout(1));
-		//send_Line2(temp);
+		sprintf(temp,"Average BPM:%1.i|",AverageVal);//yes it is 15s
+		send_Line2(temp);
 		Counter=0;
 	}
-}
 
+}
 
 
 int main(void){
@@ -183,7 +186,6 @@ int main(void){
 			if(Switch("PG1")){
 				ActiveChoice=0;//makes "option" variable go to menu
 				menu(Choice);
-				//menu_debounce();
 			}
 		}
 	}
@@ -193,10 +195,16 @@ int main(void){
 void TIM2_IRQHandler(void)// -- 10ms Loop --
 {
 	TIM2->SR&=~TIM_SR_UIF;//clear interrupt flag in status register
-
 	if(ActiveChoice==1){//if in "bpm" mode
+		Counter2++;
 		MATHS1(ADCout(1));//Do the maths (send a sample every x ms) and send it to display (via global variable)
 		ADCstartconv(1);//start conversion (for next loop);
+		if(Counter2>1500){
+			AverageVal=Average/Counter3;
+			Average=0;
+			Counter2=0;
+			Counter3=0;
+		}
 	}
 }
 	

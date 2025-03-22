@@ -6,7 +6,7 @@
 #include "timers.h"
 #include "my_dac.h"
 #include "my_led.h"
-
+#include "usart.h"
 _ARMABI size_t strlen(const char * /*s*/) __attribute__((__nonnull__(1)));//i stole this lol (makes strlen() work)
 
 void send_Line1(char* str){
@@ -83,6 +83,7 @@ void init(void){
 	createSwitch("PG1");
 	createSwitch("PG2");
 	createSwitch("PG3");
+	//init_USART();
 	LED_SETUP("PB13");
 	init_DAC();
 	ADC_SETUP("PA4",1);
