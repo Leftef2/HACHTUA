@@ -9,7 +9,7 @@
 #include "timers.h"
 #include "my_dac.h"
 #include "my_led.h"
-#define RunAvSampCount 200  //micro (find and replace)
+#define RunAvSampCount 100  //micro (find and replace)
 
 //BPM valid from 0.4Hz
 
@@ -21,10 +21,11 @@ int Timer_counter;//globals variable for data storage reasons
 int TimerControlStore;
 int val=0;
 int CounterEnable=0;
-int ActiveChoice;
+int ActiveChoice=0;
 int Scroll=0;
 int CounterSwitch=0;
-int ToleranceStore;
+int Maths_counter;
+int LineHasGoneUp=0;
 
 void menu(int ScrollLocal){//when this function is ran, it will send the correct option to LCD
 	//send_Line1("      bpm       ");  Choice=1
@@ -85,55 +86,55 @@ void menu(int ScrollLocal){//when this function is ran, it will send the correct
 void MATHS1(int A){//this will be called every 10ms
 	int Average;
 	int Counter;
-	int Is_Above_Peak;
+	int Is_Above_Threshold;
 	int BPM;
 	int MaxSamp=0;
 	int MinSamp=10000;
 	int Temp;
-	int Tolerance;
+	float Tolerance;
 	char temp[17];//makes a char array which is preassigned with "space"
 	
-	ToleranceStore++;
+	float Gain=1;
+	
+	Maths_counter++;
 	//-AVERAGING-:
 	for(int I=0;I<RunAvSampCount;I++){//run through all samples
 		RunValStore[I]=RunValStore[I+1];//Move all the values of the array left by 1 AND LEAVE A SPACE AT THE END e.g. [2,3,4,5,6, ];
 	}
 	
-	RunValStore[RunAvSampCount]=A;//takes the value (given by the adc) and adds to store
+	RunValStore[RunAvSampCount]=A;//takes the value (given by the adc) and the value to the end of store
 	
 	for(int I=0;I<RunAvSampCount;I++){
-		Average=Average+RunValStore[I];//add up all values in store
+		Temp=Temp+RunValStore[I];//add up all values in store
 	}
+	if(Maths_counter>RunAvSampCount){
+		Average=Temp/RunAvSampCount;
+	}
+	Temp=0;
 	
-	
-	//make tolerance value based on noise
-	if(ToleranceStore>100){
-		for(int I=0;I<RunAvSampCount;I++){
-			if(I>0){
-				Temp=Temp+((RunValStore[I-1]-RunValStore[I])/RunValStore[I]);//add up the difference between values next to eachother as a percentage
-			}
+	//get max/min values to apply to the gain of tolerance value
+	for(int I=0;I<RunAvSampCount;I++){
+		if(RunValStore[I]<MinSamp){
+			MinSamp=RunValStore[I];
 		}
-		Tolerance=(Temp/(RunAvSampCount-1));
-		sprintf(temp,"BPM:%1.i|",Tolerance);
-		send_Line1(temp);
-		ToleranceStore=0;
-}
+		if(RunValStore[I]>MaxSamp){
+			MaxSamp=RunValStore[I];
+		}		
+	}
+	Tolerance=((MaxSamp-MinSamp)/10000)*Gain;
+	Temp=0;
+	Tolerance=0.95;
 	// Is current sample above the allowable threshold?:
-	
 
-	if(A<Average*Tolerance){//is "line" going down
-		Is_Above_Peak=0;
-	}	
-	if(A>Average*Tolerance){//is "line" going up
-		Is_Above_Peak=1;
+	if(RunValStore[RunAvSampCount-1]<(RunValStore[RunAvSampCount]-15)){//is last value less than current (line going up)
+		LineHasGoneUp=1;
 	}
 	
-	
-	//-If above allowable threshold:
-	
-	if(Is_Above_Peak){//if above threshold and Counter is NOT COUNTING
-		CounterSwitch=!CounterSwitch;//switch the Counter
+	if((RunValStore[RunAvSampCount-1]>(RunValStore[RunAvSampCount])+15)&&LineHasGoneUp==1){
+		CounterSwitch=!CounterSwitch;
+		LineHasGoneUp=0;
 	}
+	
 	
 	if(CounterSwitch){
 		LED_ON("PB14");
@@ -141,9 +142,12 @@ void MATHS1(int A){//this will be called every 10ms
 	}
 	else{
 		LED_OFF("PB14");
-		//BPM=Counter;
-		//sprintf(temp,"BPM:%1.i|",BPM);
-		//send_Line1(temp);
+		BPM=Counter;
+		sprintf(temp,"BPM:%1.i|",BPM);
+		send_Line1(temp);
+		//sprintf(temp,"out:%1.i|",ADCout(1));
+		//send_Line2(temp);
+		Counter=0;
 	}
 }
 
@@ -155,7 +159,8 @@ int main(void){
 	menu(0);//after startup splashscreen, go to menu
 	while(1){
 		if(ActiveChoice==0){
-			while(!Switch("PG0")&&!Switch("PG1")&&!Switch("PG2")&&!Switch("PG3")){};//wait for all switch not to be pressed
+			menu_debounce();
+			while(!Switch("PG0")&&!Switch("PG1")&&!Switch("PG2")&&!Switch("PG3")){};//while any button is NOT pressed, do nothing (when button pressed, do stuff)
 			if(Switch("PG3")){
 				ActiveChoice=Choice;//make the currently selected cursor position equal the variable which controls the "mode"
 			}
@@ -172,13 +177,13 @@ int main(void){
 				Scroll=8;//same as above, but opposite
 			}
 			menu(Scroll);
-			menu_debounce();
+			while(Switch("PG0")||Switch("PG1")||Switch("PG2")||Switch("PG3")){};//while any button is NOT pressed, do nothing (when button pressed, do stuff)
 		}
 		if(ActiveChoice==1){
 			if(Switch("PG1")){
-				menu_debounce();
 				ActiveChoice=0;//makes "option" variable go to menu
 				menu(Choice);
+				//menu_debounce();
 			}
 		}
 	}

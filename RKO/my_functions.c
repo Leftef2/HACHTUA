@@ -48,12 +48,12 @@ int getNum(char* str){//creates a function that returns the pin number inputted 
 
 void debounce(void)         //blocking delay for startup splashscreen
 {
-	for(int i=0; i<13000000; i++){__NOP();}
+	for(int i=0; i<100000000; i++){__NOP();}
 }
 
 void menu_debounce(void)         //blocking delay for LCD
 {
-	for(int i=0; i<600000; i++){__NOP();}
+	for(int i=0; i<100000; i++){__NOP();}
 }
 
 
