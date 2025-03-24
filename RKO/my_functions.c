@@ -7,6 +7,7 @@
 #include "my_dac.h"
 #include "my_led.h"
 #include "usart.h"
+
 _ARMABI size_t strlen(const char * /*s*/) __attribute__((__nonnull__(1)));//i stole this lol (makes strlen() work)
 
 void send_Line1(char* str){
@@ -69,10 +70,10 @@ void Shortbuzz(void){
 		if(buz>200){
 			LED_ON("PB13");
 		}
-		else{//basically switch at double the frequency set by buz++ (i can't be bothered to work it out)
+		else{//basically switch at half the frequency set by buz++ (i can't be bothered to work it out)
 			LED_OFF("PB13");
 		}
-		if(time>200000){
+		if(time>100000){
 			break;
 		}
 	}	

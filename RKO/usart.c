@@ -17,85 +17,85 @@ void init_USART(int mod,char* Pin1,char* Pin2){
 			GPIOA->MODER|=(2u<<(2*getNum(Pin2)));
 						
 			//select alternate function
-			GPIOA->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));//clear pin function
-			GPIOA->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));// set usart as alternate function for TX_pin
-			GPIOA->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));// clear pin function
-			GPIOA->AFR[p2]|=(0x07<<(4*(getNum(Pin2)-(p2*8))));//set usart as alternate function for RX_pin
+			GPIOA->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));    //clear pin function
+			GPIOA->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));			// set usart as alternate function for TX_pin
+			GPIOA->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));		// clear pin function
+			GPIOA->AFR[p2]|=(0x07<<(4*(getNum(Pin2)-(p2*8))));			//set usart as alternate function for RX_pin
 
 		}
-		if(Pin1[1]=='B'){
-			RCC->AHB1ENR|=RCC_AHB1ENR_GPIOBEN;//enables port clock
-			GPIOB->MODER&=~(3u<<(2*getNum(Pin1)));//sets 00 on both pins
+		if(Pin1[1]=='B'){//repeat..
+			RCC->AHB1ENR|=RCC_AHB1ENR_GPIOBEN;
+			GPIOB->MODER&=~(3u<<(2*getNum(Pin1)));
 			GPIOB->MODER&=~(3u<<(2*getNum(Pin2)));	
 
-			GPIOB->MODER|=(2u<<(2*getNum(Pin1)));//sets pins to alternate function
+			GPIOB->MODER|=(2u<<(2*getNum(Pin1)));
 			GPIOB->MODER|=(2u<<(2*getNum(Pin2)));
 			
-			GPIOB->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));//clear pin function
-			GPIOB->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));// set usart as alternate function for TX_pin
-			GPIOB->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));// clear pin function
-			GPIOB->AFR[p2]|=(0x07<<(4*(getNum(Pin2)-(p2*8))));//set usart as alternate function for RX_pin
+			GPIOB->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));
+			GPIOB->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));
+			GPIOB->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));
+			GPIOB->AFR[p2]|=(0x07<<(4*(getNum(Pin2)-(p2*8))));
 		}
 		if(Pin1[1]=='C'){
-			RCC->AHB1ENR|=RCC_AHB1ENR_GPIOCEN;//enables port clock
-			GPIOC->MODER&=~(3u<<(2*getNum(Pin1)));//sets 00 on both pins
+			RCC->AHB1ENR|=RCC_AHB1ENR_GPIOCEN;
+			GPIOC->MODER&=~(3u<<(2*getNum(Pin1)));
 			GPIOC->MODER&=~(3u<<(2*getNum(Pin2)));
 
-			GPIOC->MODER|=(2u<<(2*getNum(Pin1)));//sets pins to alternate function
+			GPIOC->MODER|=(2u<<(2*getNum(Pin1)));
 			GPIOC->MODER|=(2u<<(2*getNum(Pin2)));
 
-			GPIOC->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));//clear pin function
-			GPIOC->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));// set usart as alternate function for TX_pin
-			GPIOC->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));// clear pin function
-			GPIOC->AFR[p2]|=(0x07<<(4*(getNum(Pin2)-(p2*8))));//set usart as alternate function for RX_pin
+			GPIOC->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));
+			GPIOC->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));
+			GPIOC->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));
+			GPIOC->AFR[p2]|=(0x07<<(4*(getNum(Pin2)-(p2*8))));		
 		}
 		if(Pin1[1]=='D'){
-			RCC->AHB1ENR|=RCC_AHB1ENR_GPIODEN;//enables port clock
-			GPIOD->MODER&=~(3u<<(2*getNum(Pin1)));//sets 00 on both pins
+			RCC->AHB1ENR|=RCC_AHB1ENR_GPIODEN;
+			GPIOD->MODER&=~(3u<<(2*getNum(Pin1)));
 			GPIOD->MODER&=~(3u<<(2*getNum(Pin2)));	
 
-			GPIOD->MODER|=(2u<<(2*getNum(Pin1)));//sets pins to alternate function
+			GPIOD->MODER|=(2u<<(2*getNum(Pin1)));
 			GPIOD->MODER|=(2u<<(2*getNum(Pin2)));
 			
-			GPIOD->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));//clear pin function
-			GPIOD->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));// set usart as alternate function for TX_pin
-			GPIOD->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));// clear pin function
-			GPIOD->AFR[p2]|=(0x07<<(4*(getNum(Pin2)-(p2*8))));//set usart as alternate function for RX_pin
+			GPIOD->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));
+			GPIOD->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));
+			GPIOD->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));
+			GPIOD->AFR[p2]|=(0x07<<(4*(getNum(Pin2)-(p2*8))));
 		}
 		if(Pin1[1]=='E'){
-			RCC->AHB1ENR|=RCC_AHB1ENR_GPIOEEN;//enables port clock
-			GPIOE->MODER&=~(3u<<(2*getNum(Pin1)));//sets 00 on both pins
+			RCC->AHB1ENR|=RCC_AHB1ENR_GPIOEEN;
+			GPIOE->MODER&=~(3u<<(2*getNum(Pin1)));
 			GPIOE->MODER&=~(3u<<(2*getNum(Pin2)));	
 			
-			GPIOE->MODER|=(2u<<(2*getNum(Pin1)));//sets pins to alternate function
+			GPIOE->MODER|=(2u<<(2*getNum(Pin1)));
 			GPIOE->MODER|=(2u<<(2*getNum(Pin2)));
 			
-			GPIOE->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));//clear pin function
-			GPIOE->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));// set usart as alternate function for TX_pin
-			GPIOE->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));// clear pin function
+			GPIOE->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));
+			GPIOE->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));
+			GPIOE->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));
 			GPIOE->AFR[p2]|=(0x07<<(4*(getNum(Pin2)-(p2*8))));
 		}
 		if(Pin1[1]=='F'){
-			RCC->AHB1ENR|=RCC_AHB1ENR_GPIOFEN;//enables port clock
-			GPIOF->MODER&=~(3u<<(2*getNum(Pin1)));//sets 00 on both pins
+			RCC->AHB1ENR|=RCC_AHB1ENR_GPIOFEN;
+			GPIOF->MODER&=~(3u<<(2*getNum(Pin1)));
 			GPIOF->MODER&=~(3u<<(2*getNum(Pin2)));	
 			
-			GPIOF->MODER|=(2u<<(2*getNum(Pin1)));//sets pins to alternate function
+			GPIOF->MODER|=(2u<<(2*getNum(Pin1)));
 			GPIOF->MODER|=(2u<<(2*getNum(Pin2)));
 			
-			GPIOF->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));//clear pin function
-			GPIOF->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));// set usart as alternate function for TX_pin
-			GPIOF->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));// clear pin function
-			GPIOF->AFR[p2]|=(0x07<<(4*(getNum(Pin2)-(p2*8))));//set usart as alternate function for RX_pin
+			GPIOF->AFR[p1]&=~(0x0f<<(4*(getNum(Pin1)-(p1*8))));
+			GPIOF->AFR[p1]|=(0x07<<(4*(getNum(Pin1)-(p1*8))));
+			GPIOF->AFR[p2]&=~(0x0f<<(4*(getNum(Pin2)-(p2*8))));
+			GPIOF->AFR[p2]|=(0x07<<(4*(getNum(Pin2)-(p2*8))));
 		}
 
-	RCC->APB1ENR|=RCC_APB1ENR_USART3EN;//usart clock enable
+	RCC->APB1ENR|=RCC_APB1ENR_USART3EN;			//usart clock enable
 		if(mod==1){			//USART CONFIG
 			USART1->CR1|=	USART_CR1_TE;//transmit enable
 			USART1->CR1|=	USART_CR1_RE;//receive enable
 			USART1->CR1|=	USART_CR1_UE;//usart main enable bit
 			
-			USART1->BRR=SystemCoreClock/(9600);//set baud rate
+			USART1->BRR=SystemCoreClock/(9600);		//set baud rate
 																									//this is not an accurate way to set the baudrate
 																									//and only works for 16Mhz system clock.
 		}
